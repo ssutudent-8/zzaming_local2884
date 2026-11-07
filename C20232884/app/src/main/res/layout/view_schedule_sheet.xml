@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_sheet"
+    android:elevation="12dp"
+    android:orientation="vertical"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
+    android:paddingBottom="14dp">
+
+    <FrameLayout
+        android:id="@+id/btn_schedule_handle"
+        android:layout_width="match_parent"
+        android:layout_height="32dp"
+        android:clickable="true"
+        android:contentDescription="일정 창 확장"
+        android:focusable="true">
+
+        <View
+            android:layout_width="38dp"
+            android:layout_height="4dp"
+            android:layout_gravity="center"
+            android:background="@color/divider" />
+    </FrameLayout>
+
+    <TextView
+        style="@style/Text.App.Heading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:text="일정" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView android:id="@+id/tab_this_month" style="@style/ScheduleTab" android:selected="true" android:text="이번 달" />
+        <TextView android:id="@+id/tab_unit" style="@style/ScheduleTab" android:text="부대" />
+        <TextView android:id="@+id/tab_vacation" style="@style/ScheduleTab" android:text="휴가" />
+        <TextView android:id="@+id/tab_personal" style="@style/ScheduleTab" android:text="개인" />
+        <TextView android:id="@+id/tab_all" style="@style/ScheduleTab" android:text="전체" />
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_schedules"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="4dp"
+        android:layout_weight="1"
+        android:overScrollMode="ifContentScrolls" />
+
+    <TextView
+        android:id="@+id/btn_add_vacation"
+        style="@style/Widget.App.PrimaryButton"
+        android:layout_marginTop="8dp"
+        android:text="+  휴가 추가"
+        android:visibility="gone" />
+</LinearLayout>

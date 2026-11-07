@@ -1,5 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <!--  배경 / 표면  -->
+    <color name="calendar_background">#F1F3EE</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="on_primary">#FFFFFF</color>
+    <color name="dim">#9915231B</color>
+    <color name="divider">#E0E5DE</color>
+    <!--  브랜드 (forest / sage)  -->
+    <color name="forest_900">#294F3B</color>
+    <color name="forest_700">#3F644D</color>
+    <color name="forest_500">#718F70</color>
+    <color name="sage_100">#E7EDE2</color>
+    <color name="sage_50">#F7F8F5</color>
+    <!--  글자  -->
+    <color name="text_primary">#2F4335</color>
+    <!--  변경: #7C8980(대비 3.7:1) -> #5F6D64(대비 5.4:1)  -->
+    <color name="text_secondary">#5F6D64</color>
+    <color name="text_hint">#8A968D</color>
+    <!--  휴가  -->
+    <color name="vacation">#D39A3B</color>
+    <color name="vacation_fill">#F6E8B5</color>
+    <!--  신규: 글자 전용(대비 5.9:1). 막대/채움은 vacation 유지  -->
+    <color name="vacation_text">#8A5A0F</color>
+    <!--  신규: bg_day_today_vacation 하드코딩 색 대체  -->
+    <color name="vacation_today_fill">#E4B95F</color>
+    <color name="vacation_today_stroke">#FBEEC5</color>
+    <!--  개인 일정  -->
+    <color name="personal">#A85D52</color>
+    <!--  신규: 삭제 등 위험 동작  -->
+    <color name="danger">#B3261E</color>
 </resources>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_card"
+    android:clipToPadding="false"
+    android:padding="22dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_add_schedule_date"
+            style="@style/Text.App.CaptionBold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="2025년 6월 16일" />
+
+        <TextView
+            style="@style/Text.App.Title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:text="일정 추가" />
+
+        <EditText
+            android:id="@+id/input_schedule_title"
+            style="@style/Widget.App.Input"
+            android:hint="일정 제목" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="9dp"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/input_start_time"
+                style="@style/Widget.App.Input"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:hint="시작 시간"
+                android:inputType="time" />
+
+            <EditText
+                android:id="@+id/input_end_time"
+                style="@style/Widget.App.Input"
+                android:layout_width="0dp"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:hint="종료 시간"
+                android:inputType="time" />
+        </LinearLayout>
+
+        <EditText
+            android:id="@+id/input_location"
+            style="@style/Widget.App.Input"
+            android:layout_marginTop="9dp"
+            android:hint="장소" />
+
+        <EditText
+            android:id="@+id/input_schedule_memo"
+            style="@style/Widget.App.Input.Multiline"
+            android:layout_marginTop="9dp"
+            android:hint="메모" />
+
+        <TextView
+            android:id="@+id/btn_save_schedule"
+            style="@style/Widget.App.PrimaryButton"
+            android:layout_marginTop="16dp"
+            android:text="일정 저장" />
+    </LinearLayout>
+</ScrollView>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/year_day_cell"
+    android:layout_width="match_parent"
+    android:layout_height="20dp"
+    android:clickable="true"
+    android:focusable="true">
+
+    <TextView
+        android:id="@+id/tv_year_day_number"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:textColor="@color/text_primary"
+        android:textSize="9sp"
+        tools:text="16" />
+
+    <View
+        android:id="@+id/vacation_band"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:layout_gravity="bottom"
+        android:background="@color/vacation"
+        android:visibility="gone" />
+</FrameLayout>

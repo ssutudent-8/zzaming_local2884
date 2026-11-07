@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/vacation_item"
+    style="@style/Widget.App.ListRow">
+
+    <View
+        android:layout_width="6dp"
+        android:layout_height="match_parent"
+        android:background="@color/vacation" />
+
+    <LinearLayout
+        android:layout_width="48dp"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_vacation_start"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/vacation_text"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            tools:text="6.16" />
+
+        <TextView
+            android:id="@+id/tv_vacation_start_weekday"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/vacation_text"
+            android:textSize="12sp"
+            tools:text="월" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tv_vacation_title"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center_vertical"
+        android:maxLines="2"
+        android:paddingStart="6dp"
+        android:paddingEnd="6dp"
+        android:textColor="@color/vacation_text"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        tools:text="정기 휴가" />
+
+    <TextView
+        android:id="@+id/tv_vacation_duration"
+        android:layout_width="64dp"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:textColor="@color/vacation_text"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        tools:text="4일" />
+
+    <LinearLayout
+        android:layout_width="88dp"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_vacation_end"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/vacation_text"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            tools:text="6.19" />
+
+        <TextView
+            android:id="@+id/tv_vacation_end_weekday"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/vacation_text"
+            android:textSize="12sp"
+            tools:text="목" />
+    </LinearLayout>
+</LinearLayout>

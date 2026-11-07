@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/calendar_day_cell"
+    android:layout_width="match_parent"
+    android:layout_height="48dp"
+    android:clickable="true"
+    android:focusable="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_day_number"
+            style="@style/Text.App.Body"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="16" />
+
+        <LinearLayout
+            android:id="@+id/event_dots"
+            android:layout_width="wrap_content"
+            android:layout_height="14dp"
+            android:gravity="center"
+            android:minWidth="24dp"
+            android:orientation="horizontal">
+
+            <View
+                android:id="@+id/dot_1"
+                android:layout_width="6dp"
+                android:layout_height="6dp"
+                android:layout_margin="1dp"
+                android:background="@drawable/bg_dot"
+                android:backgroundTint="@color/forest_500"
+                android:visibility="gone" />
+
+            <View
+                android:id="@+id/dot_2"
+                android:layout_width="6dp"
+                android:layout_height="6dp"
+                android:layout_margin="1dp"
+                android:background="@drawable/bg_dot"
+                android:backgroundTint="@color/personal"
+                android:visibility="gone" />
+
+            <View
+                android:id="@+id/dot_3"
+                android:layout_width="6dp"
+                android:layout_height="6dp"
+                android:layout_margin="1dp"
+                android:background="@drawable/bg_dot"
+                android:backgroundTint="@color/forest_500"
+                android:visibility="gone" />
+        </LinearLayout>
+    </LinearLayout>
+</FrameLayout>

@@ -1,0 +1,40 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools" android:id="@+id/calendar_root" android:layout_width="match_parent" android:layout_height="match_parent" android:background="@color/calendar_background" android:fitsSystemWindows="true">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical">
+        <LinearLayout android:id="@+id/calendar_header" android:layout_width="match_parent" android:layout_height="wrap_content" android:background="@color/surface" android:gravity="center_vertical" android:minHeight="72dp" android:orientation="horizontal" android:paddingStart="18dp" android:paddingEnd="18dp">
+            <TextView android:id="@+id/btn_back" android:layout_width="48dp" android:layout_height="48dp" android:clickable="true" android:contentDescription="행정반으로 돌아가기" android:focusable="true" android:gravity="center" android:text="‹" android:textColor="@color/text_primary" android:textSize="28sp"/>
+            <TextView android:id="@+id/tv_calendar_title" style="@style/Text.App.Heading" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="캘린더" android:textSize="18sp"/>
+            <TextView android:id="@+id/btn_year" style="@style/Widget.App.HeaderAction" android:contentDescription="연간 달력 보기" android:text="년"/>
+            <LinearLayout android:id="@+id/btn_today" android:layout_width="48dp" android:layout_height="48dp" android:layout_marginStart="8dp" android:background="@drawable/bg_header_action" android:clickable="true" android:contentDescription="오늘 16일로 이동" android:focusable="true" android:gravity="center" android:orientation="vertical">
+                <TextView android:id="@+id/tv_today_month" android:layout_width="28dp" android:layout_height="12dp" android:background="@color/forest_700" android:gravity="center" android:includeFontPadding="false" android:text="6월" android:textColor="@color/on_primary" android:textSize="9sp"/>
+                <TextView android:id="@+id/tv_today_number" android:layout_width="28dp" android:layout_height="20dp" android:gravity="center" android:includeFontPadding="false" android:textColor="@color/header_action_text" android:textSize="14sp" android:textStyle="bold" tools:text="16"/>
+            </LinearLayout>
+        </LinearLayout>
+        <FrameLayout android:id="@+id/calendar_content" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
+            <ScrollView android:id="@+id/month_view" android:layout_width="match_parent" android:layout_height="match_parent" android:clipToPadding="false" android:fillViewport="true" android:paddingStart="16dp" android:paddingTop="16dp" android:paddingEnd="16dp" android:paddingBottom="350dp">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:background="@drawable/bg_card" android:orientation="vertical" android:padding="16dp">
+                    <FrameLayout android:layout_width="match_parent" android:layout_height="56dp">
+                        <TextView android:id="@+id/btn_previous_month" android:layout_width="48dp" android:layout_height="match_parent" android:layout_gravity="start" android:clickable="true" android:contentDescription="이전 달" android:focusable="true" android:gravity="center" android:text="‹" android:textColor="@color/text_secondary" android:textSize="24sp"/>
+                        <LinearLayout android:layout_width="wrap_content" android:layout_height="match_parent" android:layout_gravity="center" android:gravity="center" android:orientation="vertical">
+                            <TextView android:id="@+id/tv_year" style="@style/Text.App.Caption" android:layout_width="wrap_content" android:layout_height="wrap_content" tools:text="2025년"/>
+                            <TextView android:id="@+id/tv_month" style="@style/Text.App.Title" android:layout_width="wrap_content" android:layout_height="wrap_content" tools:text="6월"/>
+                        </LinearLayout>
+                        <TextView android:id="@+id/btn_next_month" android:layout_width="48dp" android:layout_height="match_parent" android:layout_gravity="end" android:clickable="true" android:contentDescription="다음 달" android:focusable="true" android:gravity="center" android:text="›" android:textColor="@color/text_secondary" android:textSize="24sp"/>
+                    </FrameLayout>
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="32dp" android:orientation="horizontal">
+                        <TextView style="@style/CalendarWeekday" android:text="일"/>
+                        <TextView style="@style/CalendarWeekday" android:text="월"/>
+                        <TextView style="@style/CalendarWeekday" android:text="화"/>
+                        <TextView style="@style/CalendarWeekday" android:text="수"/>
+                        <TextView style="@style/CalendarWeekday" android:text="목"/>
+                        <TextView style="@style/CalendarWeekday" android:text="금"/>
+                        <TextView style="@style/CalendarWeekday" android:text="토"/>
+                    </LinearLayout>
+                    <androidx.recyclerview.widget.RecyclerView android:id="@+id/rv_calendar_days" android:layout_width="match_parent" android:layout_height="wrap_content" android:nestedScrollingEnabled="false"/>
+                </LinearLayout>
+            </ScrollView>
+            <androidx.recyclerview.widget.RecyclerView android:id="@+id/year_view" android:layout_width="match_parent" android:layout_height="match_parent" android:clipToPadding="false" android:padding="16dp" android:visibility="gone"/>
+            <View android:id="@+id/dim_overlay" android:layout_width="match_parent" android:layout_height="match_parent" android:background="@color/dim" android:clickable="true" android:visibility="gone"/>
+            <include android:id="@+id/schedule_sheet" layout="@layout/view_schedule_sheet" android:layout_width="match_parent" android:layout_height="330dp" android:layout_gravity="bottom" android:layout_marginStart="16dp" android:layout_marginEnd="16dp"/>
+        </FrameLayout>
+    </LinearLayout>
+</FrameLayout>

@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_card"
+    android:clipToPadding="false"
+    android:padding="22dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_detail_category"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/personal"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            tools:text="개인 일정" />
+
+        <TextView
+            android:id="@+id/tv_detail_title"
+            style="@style/Text.App.Title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="14dp"
+            tools:text="개인 운동" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tv_detail_start"
+                style="@style/Text.App.Body"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:minHeight="64dp"
+                android:textStyle="bold"
+                tools:text="시작 시간\n19:00" />
+
+            <TextView
+                android:id="@+id/tv_detail_end"
+                style="@style/Text.App.Body"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:minHeight="64dp"
+                android:textStyle="bold"
+                tools:text="종료 시간\n20:00" />
+
+            <TextView
+                android:id="@+id/tv_detail_location"
+                style="@style/Text.App.Body"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:minHeight="64dp"
+                android:textStyle="bold"
+                tools:text="장소\n체력단련장" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tv_fixed_message"
+            style="@style/Text.App.Body"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/bg_input"
+            android:padding="12dp"
+            android:visibility="gone"
+            tools:text="서버 고정 메시지" />
+
+        <EditText
+            android:id="@+id/input_detail_memo"
+            style="@style/Widget.App.Input.Multiline"
+            android:layout_marginTop="12dp"
+            android:hint="사용자 메모" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/btn_delete_schedule"
+                style="@style/Widget.App.DangerButton"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:text="일정 삭제" />
+
+            <TextView
+                android:id="@+id/btn_save_memo"
+                style="@style/Widget.App.PrimaryButton"
+                android:layout_width="0dp"
+                android:layout_weight="1.5"
+                android:text="메모 저장" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

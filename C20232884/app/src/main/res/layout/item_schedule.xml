@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/schedule_item"
+    style="@style/Widget.App.ListRow">
+
+    <View
+        android:id="@+id/category_bar"
+        android:layout_width="6dp"
+        android:layout_height="match_parent"
+        android:background="@color/forest_500" />
+
+    <LinearLayout
+        android:layout_width="48dp"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_start_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/forest_700"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            tools:text="6.18" />
+
+        <TextView
+            android:id="@+id/tv_weekday"
+            style="@style/Text.App.Caption"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="수" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tv_schedule_title"
+        style="@style/Text.App.Body"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center_vertical"
+        android:maxLines="2"
+        android:paddingStart="6dp"
+        android:paddingEnd="6dp"
+        android:textStyle="bold"
+        tools:text="개인 운동" />
+
+    <TextView
+        android:id="@+id/tv_start_time"
+        android:layout_width="64dp"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:textColor="@color/personal"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        tools:text="19:00" />
+
+    <TextView
+        android:id="@+id/tv_location"
+        android:layout_width="88dp"
+        android:layout_height="match_parent"
+        android:ellipsize="end"
+        android:gravity="center_vertical|end"
+        android:maxLines="1"
+        android:paddingEnd="6dp"
+        android:textColor="@color/personal"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        tools:text="체력단련장" />
+</LinearLayout>
