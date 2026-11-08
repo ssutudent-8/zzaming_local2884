@@ -36,7 +36,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <TextView android:id="@+id/tab_this_month" style="@style/ScheduleTab" android:selected="true" android:text="이번 달" />
+        <TextView android:id="@+id/tab_this_month" style="@style/ScheduleTab" android:text="이번 달" />
         <TextView android:id="@+id/tab_unit" style="@style/ScheduleTab" android:text="부대" />
         <TextView android:id="@+id/tab_vacation" style="@style/ScheduleTab" android:text="휴가" />
         <TextView android:id="@+id/tab_personal" style="@style/ScheduleTab" android:text="개인" />

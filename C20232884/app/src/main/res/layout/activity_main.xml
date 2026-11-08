@@ -13,4 +13,11 @@
         android:backgroundTint="@color/forest_900"
         android:text="캘린더" />
 
+    <Button
+        android:id="@+id/btn_main_to_board"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/forest_900"
+        android:text="게시판" />
+
 </LinearLayout>

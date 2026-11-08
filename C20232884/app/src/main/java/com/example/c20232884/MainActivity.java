@@ -34,6 +34,16 @@ public class MainActivity extends AppCompatActivity {
 
         });
 
+        Button btnMainToBoard = findViewById(R.id.btn_main_to_board);
+        btnMainToBoard.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, CalendarActivity.class);
+                startActivity(intent);
+            }
+
+        });
+
 
     }
 }

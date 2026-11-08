@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_card"
+    android:clipToPadding="false"
+    android:padding="22dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/Text.App.CaptionBold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="부대 게시판" />
+
+                <TextView
+                    style="@style/Text.App.Title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="새 글 작성" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/btn_close_compose"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:clickable="true"
+                android:contentDescription="닫기"
+                android:focusable="true"
+                android:gravity="center"
+                android:text="✕"
+                android:textColor="@color/text_secondary"
+                android:textSize="18sp" />
+        </LinearLayout>
+
+        <TextView
+            style="@style/Text.App.CaptionBold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="6dp"
+            android:text="카테고리" />
+
+        <Spinner
+            android:id="@+id/spinner_category"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="@drawable/bg_input"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp" />
+
+        <TextView
+            style="@style/Text.App.CaptionBold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="6dp"
+            android:text="글 제목" />
+
+        <EditText
+            android:id="@+id/input_post_title"
+            style="@style/Widget.App.Input"
+            android:hint="제목을 입력해주세요" />
+
+        <TextView
+            style="@style/Text.App.CaptionBold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="6dp"
+            android:text="내용" />
+
+        <EditText
+            android:id="@+id/input_post_body"
+            style="@style/Widget.App.Input.Multiline"
+            android:layout_height="160dp"
+            android:hint="대원들과 나눌 내용을 작성해주세요"
+            android:maxLines="10" />
+
+        <TextView
+            android:id="@+id/btn_publish_post"
+            style="@style/Widget.App.PrimaryButton"
+            android:layout_marginTop="16dp"
+            android:text="게시하기" />
+    </LinearLayout>
+</ScrollView>

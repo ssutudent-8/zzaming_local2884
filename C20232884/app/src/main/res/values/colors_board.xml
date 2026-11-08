@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="personal_fill">#F3E1DE</color>
+    <color name="notice_post_bg">#FBF8EC</color>
+    <color name="notice_post_stroke">#EFE3B8</color>
+</resources>
