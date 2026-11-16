@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
         btnMainToBoard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, CalendarActivity.class);
+                Intent intent = new Intent(MainActivity.this, BoardActivity.class);
                 startActivity(intent);
             }
 
