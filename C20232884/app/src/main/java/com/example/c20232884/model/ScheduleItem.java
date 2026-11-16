@@ -59,7 +59,7 @@ public class ScheduleItem {
     }
 
     public String getMemo() {
-        return memo;
+        return (memo != null) ? memo : "";
     }
 
     //Setter
