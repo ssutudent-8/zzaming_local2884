@@ -100,8 +100,7 @@
                 android:fillViewport="true"
                 android:paddingStart="16dp"
                 android:paddingTop="16dp"
-                android:paddingEnd="16dp"
-                android:paddingBottom="350dp">
+                android:paddingEnd="16dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -158,7 +157,7 @@
                             android:contentDescription="다음 달"
                             android:focusable="true"
                             android:gravity="center"
-                            android:text=">"
+                            android:text="›"
                             android:textColor="@color/text_secondary"
                             android:textSize="24sp" />
                     </FrameLayout>
@@ -229,7 +228,8 @@
                 android:layout_height="match_parent"
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp"
-                app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"/>
+                app:behavior_fitToContents="true"
+                app:layout_behavior="com.example.c20232884.HandleOnlyBottomSheetBehavior"/>
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
     </LinearLayout>

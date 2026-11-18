@@ -22,7 +22,7 @@
         <FrameLayout
             android:id="@+id/btn_schedule_handle"
             android:layout_width="match_parent"
-            android:layout_height="32dp"
+            android:layout_height="56dp"
             android:clickable="true"
             android:contentDescription="일정 창 확장"
             android:focusable="true">
