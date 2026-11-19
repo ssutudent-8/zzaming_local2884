@@ -12,26 +12,52 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/tv_detail_category"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/personal"
-            android:textSize="12sp"
-            android:textStyle="bold"
-            tools:text="개인 일정" />
-
-        <TextView
-            android:id="@+id/tv_detail_title"
-            style="@style/Text.App.Title"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="14dp"
-            tools:text="개인 운동" />
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tv_detail_category"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/personal"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    tools:text="개인 일정" />
+
+                <TextView
+                    android:id="@+id/tv_detail_title"
+                    style="@style/Text.App.Title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    tools:text="개인 운동" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/btn_close_detail"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:clickable="true"
+                android:contentDescription="닫기"
+                android:focusable="true"
+                android:gravity="center"
+                android:text="✕"
+                android:textColor="@color/text_secondary"
+                android:textSize="18sp" />
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
             android:orientation="horizontal">
 
             <TextView
