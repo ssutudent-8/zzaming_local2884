@@ -38,8 +38,11 @@ public class CalendarActivity extends AppCompatActivity {
     private ScheduleAdapter scheduleAdapter;
     private List<String> serviceMonthList = new ArrayList<>();
     private int currentMonthIndex = 0;
-
+    private String selectedDayNumber = "";
     private String currentFilter = "THIS_MONTH";
+    private android.content.BroadcastReceiver dateChangeReceiver;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,15 +59,19 @@ public class CalendarActivity extends AppCompatActivity {
         });
 
         binding.btnYear.setOnClickListener(v -> showEnlistmentDatePicker());
-
+        binding.btnToday.setOnClickListener(v -> moveToToday());
 
 
         //일정 시트 확장
         bottomSheetBehavior = BottomSheetBehavior.from(binding.scheduleSheet.getRoot());
         bottomSheetBehavior.setFitToContents(true);
 
-        int peekHeightPx = (int)(300 * getResources().getDisplayMetrics().density);
+        int peekHeightPx = (int)(400 * getResources().getDisplayMetrics().density);
         bottomSheetBehavior.setPeekHeight(peekHeightPx);
+
+        int calculatedPaddingPx = (int)((432) * getResources().getDisplayMetrics().density);
+        binding.scheduleSheet.rvSchedules.setClipToPadding(false);
+        binding.scheduleSheet.rvSchedules.setPadding(0, 0, 0, calculatedPaddingPx);
 
         binding.scheduleSheet.btnScheduleHandle.setOnClickListener(v -> toggleScheduleSheet());
 
@@ -73,9 +80,15 @@ public class CalendarActivity extends AppCompatActivity {
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
                 if(newState == BottomSheetBehavior.STATE_EXPANDED) {
                     binding.scheduleSheet.btnAddSchedule.setVisibility(View.VISIBLE);
+                    binding.scheduleSheet.rvSchedules.setPadding(0, 0, 0, 0);
+
                 } else if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
                     binding.dimOverlay.setVisibility(View.GONE);
                     binding.scheduleSheet.btnAddSchedule.setVisibility(View.GONE);
+
+                    int calculatedPaddingPx = (int)((432) * getResources().getDisplayMetrics().density);
+                    binding.scheduleSheet.rvSchedules.setClipToPadding(false);
+                    binding.scheduleSheet.rvSchedules.setPadding(0, 0, 0, calculatedPaddingPx);
                 }
             }
 
@@ -110,6 +123,7 @@ public class CalendarActivity extends AppCompatActivity {
 
         // 3. 탭 클릭 이벤트 연결
         setupTabListeners();
+        initTodayViews();
 
         // 4. 어댑터 연결
         scheduleAdapter = new ScheduleAdapter(scheduleList);
@@ -132,6 +146,24 @@ public class CalendarActivity extends AppCompatActivity {
             }
         });
 
+        registerDateChangeReceiver();
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // 화면으로 돌아올 때마다 오늘 날짜 정보 최신화
+        initTodayViews();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Activity 파괴 시 리시버 해제 (메모리 누수 방지)
+        if (dateChangeReceiver != null) {
+            unregisterReceiver(dateChangeReceiver);
+        }
     }
 
     private void toggleScheduleSheet() {
@@ -180,18 +212,6 @@ public class CalendarActivity extends AppCompatActivity {
 
         dialog.show();
 
-    }
-
-    private List<ScheduleItem> getSchedulesForMonth(int year, int month) {
-        List<ScheduleItem> filteredList = new ArrayList<>();
-        String targetYearMonth = String.format(Locale.KOREA, "%04d-%02d", year, month + 1);
-
-        for (ScheduleItem item : allScheduleList) {
-            if (item.getDate() != null && item.getDate().startsWith(targetYearMonth)) {
-                filteredList.add(item);
-            }
-        }
-        return filteredList;
     }
 
     /**
@@ -273,6 +293,14 @@ public class CalendarActivity extends AppCompatActivity {
         int year = Integer.parseInt(parts[0]);
         int month = Integer.parseInt(parts[1]) - 1; // 자바 Calendar는 0이 1월이므로 -1
 
+        Calendar realToday = Calendar.getInstance();
+        int realYear = realToday.get(Calendar.YEAR);
+        int realMonth = realToday.get(Calendar.MONTH);
+        int realDay = realToday.get(Calendar.DAY_OF_MONTH);
+
+// 현재 캘린더가 실제 오늘 달을 보고 있을 때만 todayDayStr 전달
+        String todayDayStr = (year == realYear && month == realMonth) ? String.valueOf(realDay) : "";
+
         // [동기화 1] 상단 연/월 헤더 텍스트 동적 변경
         binding.tvYear.setText(year + "년");
         binding.tvMonth.setText((month + 1) + "월");
@@ -294,25 +322,32 @@ public class CalendarActivity extends AppCompatActivity {
         }
 
         // 날짜 클릭 시 해당 날짜로 일정 추가 다이얼로그 연동
-        CalendarDayAdapter dayAdapter = new CalendarDayAdapter(daysInMonth, selectedDay -> {
-            if (serviceMonthList.isEmpty()) return;
+        CalendarDayAdapter dayAdapter = new CalendarDayAdapter(daysInMonth, selectedDayNumber, todayDayStr, new CalendarDayAdapter.OnDayClickListener() {
+            @Override
+            public void onDaySelect(String day) {
+                // 1회 클릭: 날짜 선택 및 해당 일자 일정 필터링
+                selectedDayNumber = day;
+                filterScheduleForSelectedDay(year, month, day);
+            }
 
-            String fullDateStr = currentYM + "-" + String.format(Locale.KOREA, "%02d", Integer.parseInt(selectedDay));
-
-            // 클릭한 동적 날짜로 다이얼로그 팝업 호출
-            showAddScheduleDialogForDate(fullDateStr);
+            @Override
+            public void onDayAddSchedule(String day) {
+                // 2회 클릭: 일정 추가 팝업 호출
+                String fullDateStr = String.format(Locale.KOREA, "%04d-%02d-%02d", year, month + 1, Integer.parseInt(day));
+                showAddScheduleDialogForDate(fullDateStr);
+            }
         });
 
         binding.rvCalendarDays.setLayoutManager(new androidx.recyclerview.widget.GridLayoutManager(this, 7));
         binding.rvCalendarDays.setAdapter(dayAdapter);
 
         // [동기화 3] 이번 달에 해당하는 일정만 스마트 필터링 후 리스트 갱신
-        List<ScheduleItem> newMonthSchedules = getSchedulesForMonth(year, month);
+        List<ScheduleItem> MonthSchedules = filterSchedules(year, month);
         scheduleList.clear();
-        scheduleList.addAll(newMonthSchedules);
+        scheduleList.addAll(MonthSchedules);
 
-        if (binding.scheduleSheet.rvSchedules.getAdapter() != null) {
-            binding.scheduleSheet.rvSchedules.getAdapter().notifyDataSetChanged();
+        if (scheduleAdapter != null) {
+            scheduleAdapter.notifyDataSetChanged();
         }
     }
 
@@ -324,7 +359,8 @@ public class CalendarActivity extends AppCompatActivity {
         binding.scheduleSheet.tabUnit.setOnClickListener(v -> applyFilter("UNIT"));
         binding.scheduleSheet.tabVacation.setOnClickListener(v -> applyFilter("VACATION"));
         binding.scheduleSheet.tabPersonal.setOnClickListener(v -> applyFilter("PERSONAL"));
-        binding.scheduleSheet.tabAll.setOnClickListener(v -> applyFilter("ALL"));
+
+        updateTabStyles();
     }
 
     /**
@@ -332,6 +368,7 @@ public class CalendarActivity extends AppCompatActivity {
      */
     private void applyFilter(String filter) {
         this.currentFilter = filter;
+        updateTabStyles();
         updateCalendarView();
     }
 
@@ -384,6 +421,133 @@ public class CalendarActivity extends AppCompatActivity {
         });
 
         dialog.show();
+    }
+
+    private void moveToToday() {
+        Calendar today = Calendar.getInstance();
+        int todayYear = today.get(Calendar.YEAR);
+        int todayMonth = today.get(Calendar.MONTH); // 0이 1월
+        int todayDay = today.get(Calendar.DAY_OF_MONTH);
+
+        String targetYM = String.format(Locale.KOREA, "%04d-%02d", todayYear, todayMonth + 1);
+
+        // 복무 달 목록에서 오늘 연/월의 위치(Index) 검색
+        int foundIndex = -1;
+        for (int i = 0; i < serviceMonthList.size(); i++) {
+            if (serviceMonthList.get(i).equals(targetYM)) {
+                foundIndex = i;
+                break;
+            }
+        }
+
+        if (foundIndex != -1) {
+            currentMonthIndex = foundIndex;
+            selectedDayNumber = String.valueOf(todayDay); // 오늘 날짜 선택
+            updateCalendarView();
+        } else {
+            Toast.makeText(this, "오늘 날짜가 복무 기간에 포함되어 있지 않습니다.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void filterScheduleForSelectedDay(int year, int month, String day) {
+        String fullDateStr = String.format(Locale.KOREA, "%04d-%02d-%02d", year, month + 1, Integer.parseInt(day));
+        List<ScheduleItem> daySchedules = new ArrayList<>();
+
+        for (ScheduleItem item : allScheduleList) {
+            if (item.getDate() != null && item.getDate().equals(fullDateStr)) {
+                daySchedules.add(item);
+            }
+        }
+
+        scheduleList.clear();
+        scheduleList.addAll(daySchedules);
+
+        if (scheduleAdapter != null) {
+            scheduleAdapter.notifyDataSetChanged();
+        }
+    }
+
+    private List<ScheduleItem> filterSchedules(int year, int month) {
+
+        List<ScheduleItem> todaySchedules = new ArrayList<>();   // 1구역: 오늘 일정
+        List<ScheduleItem> monthSchedules = new ArrayList<>();   // 2구역: 이번 달 남은 일정
+        List<ScheduleItem> futureSchedules = new ArrayList<>();  // 3구역: 미래 일정
+        List<ScheduleItem> pastSchedules = new ArrayList<>();    // 4구역: 지난 일정
+
+
+
+        Calendar today = Calendar.getInstance();
+        String todayStr = String.format(Locale.KOREA, "%04d-%02d-%02d",
+                today.get(Calendar.YEAR), today.get(Calendar.MONTH) + 1, today.get(Calendar.DAY_OF_MONTH));
+        String currentYM = String.format(Locale.KOREA, "%04d-%02d", year, month + 1);
+
+        for (ScheduleItem item : allScheduleList) {
+            if (item.getDate() == null) continue;
+
+            String type = (item.getType() != null) ? item.getType() : "";
+            boolean matchesType = "THIS_MONTH".equals(currentFilter) ||
+                    ("UNIT".equals(currentFilter) && "부대".equals(type)) ||
+                    ("VACATION".equals(currentFilter) && "휴가".equals(type)) ||
+                    ("PERSONAL".equals(currentFilter) && "개인".equals(type));
+
+            if (!matchesType) continue;
+
+            // 시간선에 따른 4구역 분류
+            if (item.getDate().equals(todayStr)) {
+                todaySchedules.add(item);
+            } else if (item.getDate().startsWith(currentYM)) {
+                monthSchedules.add(item);
+            } else if (item.getDate().compareTo(todayStr) > 0) {
+                futureSchedules.add(item);
+            } else {
+                pastSchedules.add(item);
+            }
+        }
+
+        // 4단계 조합: 오늘 ➔ 이번 달 남은 일정 ➔ 미래 일정 ➔ 지난 일정
+        List<ScheduleItem> result = new ArrayList<>();
+        result.addAll(todaySchedules);
+        result.addAll(monthSchedules);
+        result.addAll(futureSchedules);
+        result.addAll(pastSchedules);
+
+        return result;
+    }
+
+    private void updateTabStyles() {
+        binding.scheduleSheet.tabThisMonth.setSelected("THIS_MONTH".equals(currentFilter));
+        binding.scheduleSheet.tabUnit.setSelected("UNIT".equals(currentFilter));
+        binding.scheduleSheet.tabVacation.setSelected("VACATION".equals(currentFilter));
+        binding.scheduleSheet.tabPersonal.setSelected("PERSONAL".equals(currentFilter));
+    }
+
+    private void initTodayViews() {
+        Calendar today = Calendar.getInstance();
+        int todayMonth = today.get(Calendar.MONTH) + 1; // 1~12월
+        int todayDay = today.get(Calendar.DAY_OF_MONTH); // 1~31일
+
+        // 오늘 버튼 내부 텍스트 갱신 (예: "3월", "30")
+        binding.tvTodayMonth.setText(todayMonth + "월");
+        binding.tvTodayNumber.setText(String.valueOf(todayDay));
+
+        // 일정 시트 '이번 달' 탭 텍스트 갱신 (예: "3월")
+        binding.scheduleSheet.tabThisMonth.setText(todayMonth + "월");
+    }
+
+    private void registerDateChangeReceiver() {
+        android.content.IntentFilter filter = new android.content.IntentFilter();
+        filter.addAction(android.content.Intent.ACTION_DATE_CHANGED);
+        filter.addAction(android.content.Intent.ACTION_TIME_TICK); // 매 분마다 시계 확인
+
+        dateChangeReceiver = new android.content.BroadcastReceiver() {
+            @Override
+            public void onReceive(android.content.Context context, android.content.Intent intent) {
+                initTodayViews();
+                updateCalendarView();
+            }
+        };
+
+        registerReceiver(dateChangeReceiver, filter);
     }
 
 }

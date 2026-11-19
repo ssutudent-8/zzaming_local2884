@@ -86,18 +86,16 @@
             </LinearLayout>
         </LinearLayout>
 
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
-        android:id="@+id/calendar_content"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
+            android:id="@+id/calendar_content"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
 
-            <ScrollView
+            <FrameLayout
                 android:id="@+id/month_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:clipToPadding="false"
-                android:fillViewport="true"
                 android:paddingStart="16dp"
                 android:paddingTop="16dp"
                 android:paddingEnd="16dp">
@@ -200,9 +198,10 @@
                         android:id="@+id/rv_calendar_days"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:nestedScrollingEnabled="false" />
+                        android:nestedScrollingEnabled="false"
+                        android:overScrollMode="never" />
                 </LinearLayout>
-            </ScrollView>
+            </FrameLayout>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/year_view"
@@ -230,7 +229,16 @@
                 android:layout_marginEnd="16dp"
                 app:behavior_fitToContents="true"
                 app:layout_behavior="com.example.c20232884.HandleOnlyBottomSheetBehavior"/>
+            <View
+                android:id="@+id/sheet_bottom_cover"
+                android:layout_width="match_parent"
+                android:layout_height="32dp"
+                android:layout_gravity="bottom"
+                android:layout_marginStart="17dp"
+                android:layout_marginEnd="17dp"
+                android:background="@color/surface"
+                android:elevation="0dp" />
 
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+        </androidx.coordinatorlayout.widget.CoordinatorLayout>
     </LinearLayout>
 </FrameLayout>
