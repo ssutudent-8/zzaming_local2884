@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/board_root"
+    android:id="@+id/post_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/calendar_background"
@@ -8,7 +8,7 @@
     android:orientation="vertical">
 
     <LinearLayout
-        android:id="@+id/board_header"
+        android:id="@+id/post_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/surface"
@@ -23,7 +23,7 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:clickable="true"
-            android:contentDescription="행정반으로 돌아가기"
+            android:contentDescription="돌아가기"
             android:focusable="true"
             android:gravity="center"
             android:text="‹"
@@ -31,7 +31,7 @@
             android:textSize="28sp" />
 
         <TextView
-            android:id="@+id/tv_board_title"
+            android:id="@+id/tv_post_header_title"
             style="@style/Text.App.Heading"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -71,7 +71,7 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/tv_board_unit"
+                android:id="@+id/tv_post_unit"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="백골대대"
@@ -122,7 +122,7 @@
             android:padding="16dp" />
 
         <TextView
-            android:id="@+id/board_empty"
+            android:id="@+id/post_empty"
             style="@style/Text.App.Caption"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

@@ -1,36 +1,48 @@
 package com.example.c20232884;
 
+import android.graphics.Color;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.c20232884.databinding.ItemCalendarDayBinding;
+import com.example.c20232884.model.ScheduleItem;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
+/**
+ * 달력 날짜 그리드를 표출하고 휴가 면적 채우기 및 최대 6개 동적 도트를 표시하는 어댑터 클래스
+ */
 public class CalendarDayAdapter extends RecyclerView.Adapter<CalendarDayAdapter.DayViewHolder> {
 
     public interface OnDayClickListener {
-
         void onDaySelect(String day);
-
         void onDayAddSchedule(String day);
     }
 
     private List<String> daysList;
     private OnDayClickListener listener;
-    private String selectedDay = "";
+    private String selectedFullDate = "";
     private String todayDay = "";
+    private List<ScheduleItem> allScheduleList;
+    private String currentYM = "";
 
-    public CalendarDayAdapter(List<String> daysList, String selectedDay, String todayDay, OnDayClickListener listener) {
+    public CalendarDayAdapter(List<String> daysList, String selectedFullDate, String todayDay,
+                              List<ScheduleItem> allScheduleList, String currentYM,
+                              OnDayClickListener listener) {
         this.daysList = daysList;
-        this.selectedDay = selectedDay;
+        this.selectedFullDate = (selectedFullDate != null) ? selectedFullDate : "";
         this.todayDay = todayDay;
+        this.allScheduleList = allScheduleList;
+        this.currentYM = (currentYM != null) ? currentYM : "";
         this.listener = listener;
     }
-
 
     @NonNull
     @Override
@@ -47,33 +59,107 @@ public class CalendarDayAdapter extends RecyclerView.Adapter<CalendarDayAdapter.
         holder.binding.tvDayNumber.setText(day);
 
         if (day != null && !day.isEmpty()) {
-            boolean isSelected = day.equals(selectedDay);
+            String tempFullDate = "";
+            try {
+                int dayInt = Integer.parseInt(day);
+                tempFullDate = String.format(Locale.KOREA, "%s-%02d", currentYM, dayInt);
+            } catch (Exception ignored) {}
+
+            // [수정] 람다식 내부 사용을 위해 final 변수로 고정 선언 (빨간 줄 해결)
+            final String fullDateStr = tempFullDate;
+
+            // 연-월-일(YYYY-MM-DD) 전체 유일 선택 상태 비교
+            boolean isSelected = !fullDateStr.isEmpty() && fullDateStr.equals(selectedFullDate);
             boolean isToday = day.equals(todayDay);
 
-            // 1) 선택된 날짜 ➔ 날짜 셀 전체(itemView)에 bg_day_selected(연한 초록색 카드) 적용
-            if (isSelected) {
-                holder.itemView.setBackgroundResource(R.drawable.bg_day_selected);
-            } else {
-                holder.itemView.setBackground(null);
+            List<Integer> dotColors = new ArrayList<>();
+            boolean hasVacation = false;
+
+            if (allScheduleList != null && !fullDateStr.isEmpty()) {
+                int unitColor = ContextCompat.getColor(holder.itemView.getContext(), R.color.forest_500);
+                int personalColor = ContextCompat.getColor(holder.itemView.getContext(), R.color.personal);
+
+                List<Integer> unitDotList = new ArrayList<>();
+                List<Integer> personalDotList = new ArrayList<>();
+
+                for (ScheduleItem item : allScheduleList) {
+                    if (fullDateStr.equals(item.getDate())) {
+                        String type = item.getType();
+                        if ("부대".equals(type)) unitDotList.add(unitColor);
+                        else if ("개인".equals(type)) personalDotList.add(personalColor);
+                        else if ("휴가".equals(type)) hasVacation = true;
+                    }
+                }
+
+                // 부대 일정(초록점) 우선 배치 후 개인 일정(빨간점) 배치
+                dotColors.addAll(unitDotList);
+                dotColors.addAll(personalDotList);
+
+                // 최대 6개 제한 (초과 시 뒤에 있는 개인 일정부터 우선 탈락)
+                if (dotColors.size() > 6) {
+                    dotColors = dotColors.subList(0, 6);
+                }
             }
 
-            // 2) 오늘 날짜 ➔ 숫자 글자판(tvDayNumber)에 새로 만든 bg_day_today(숲색 배지) 적용
-            if (isToday) {
-                holder.binding.tvDayNumber.setBackgroundResource(R.drawable.bg_day_today);
-                holder.binding.tvDayNumber.setTextColor(android.graphics.Color.WHITE);
+            // 1) 배경 설정: 휴가 배경을 숫자와 도트 '뒤' 셀 배경(itemView)으로 배치
+            if (hasVacation) {
+                if (isToday) {
+                    holder.binding.tvDayNumber.setBackgroundResource(R.drawable.bg_day_today_vacation);
+                    holder.binding.tvDayNumber.setTextColor(Color.WHITE);
+                    holder.itemView.setBackgroundResource(R.drawable.bg_day_vacation);
+                } else if (isSelected) {
+                    holder.binding.tvDayNumber.setBackground(null);
+                    holder.binding.tvDayNumber.setTextColor(holder.itemView.getContext().getColor(R.color.text_primary));
+                    holder.itemView.setBackgroundResource(R.drawable.bg_day_today_vacation);
+                } else {
+                    holder.binding.tvDayNumber.setBackground(null);
+                    holder.binding.tvDayNumber.setTextColor(holder.itemView.getContext().getColor(R.color.text_primary));
+                    holder.itemView.setBackgroundResource(R.drawable.bg_day_vacation);
+                }
             } else {
-                holder.binding.tvDayNumber.setBackground(null);
-                holder.binding.tvDayNumber.setTextColor(holder.itemView.getContext().getColor(R.color.text_primary));
+                // 일반 날짜 배경 설정
+                if (isSelected) {
+                    holder.itemView.setBackgroundResource(R.drawable.bg_day_selected);
+                } else {
+                    holder.itemView.setBackground(null);
+                }
+
+                if (isToday) {
+                    holder.binding.tvDayNumber.setBackgroundResource(R.drawable.bg_day_today);
+                    holder.binding.tvDayNumber.setTextColor(Color.WHITE);
+                } else {
+                    holder.binding.tvDayNumber.setBackground(null);
+                    holder.binding.tvDayNumber.setTextColor(holder.itemView.getContext().getColor(R.color.text_primary));
+                }
             }
 
-            // 2단계 클릭 이벤트 로직
+            // 2) 도트 바인딩: 배경 위로 최대 6개 동적 도트 선명하게 바인딩
+            View[] dots = new View[]{
+                    holder.binding.dot1, holder.binding.dot2, holder.binding.dot3,
+                    holder.binding.dot4, holder.binding.dot5, holder.binding.dot6
+            };
+
+            if (!dotColors.isEmpty()) {
+                holder.binding.eventDotsContainer.setVisibility(View.VISIBLE);
+                for (int i = 0; i < dots.length; i++) {
+                    if (i < dotColors.size()) {
+                        dots[i].setVisibility(View.VISIBLE);
+                        dots[i].setBackgroundTintList(android.content.res.ColorStateList.valueOf(dotColors.get(i)));
+                    } else {
+                        dots[i].setVisibility(View.GONE);
+                    }
+                }
+            } else {
+                holder.binding.eventDotsContainer.setVisibility(View.GONE);
+            }
+
             holder.itemView.setOnClickListener(v -> {
                 if (listener == null) return;
-
-                if (day.equals(selectedDay)) {
+                // 선택 상태 비교 시 fullDateStr로 유일 비교
+                if (!fullDateStr.isEmpty() && fullDateStr.equals(selectedFullDate)) {
                     listener.onDayAddSchedule(day);
                 } else {
-                    selectedDay = day;
+                    selectedFullDate = fullDateStr;
                     notifyDataSetChanged();
                     listener.onDaySelect(day);
                 }
@@ -81,6 +167,7 @@ public class CalendarDayAdapter extends RecyclerView.Adapter<CalendarDayAdapter.
         } else {
             holder.itemView.setBackground(null);
             holder.binding.tvDayNumber.setBackground(null);
+            holder.binding.eventDotsContainer.setVisibility(View.GONE);
             holder.itemView.setOnClickListener(null);
         }
     }

@@ -26,7 +26,15 @@
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".BoardActivity"
+            android:name=".PostActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".PostComposeActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".PostDetailActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
     </application>

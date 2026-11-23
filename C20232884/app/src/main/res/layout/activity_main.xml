@@ -6,6 +6,15 @@
     android:gravity="center"
     android:orientation="vertical"
     >
+
+    <Button
+        android:id="@+id/btn_main_setting"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:backgroundTint="@color/forest_700"
+        android:text="복무 및 권한 설정" />
+
     <Button
         android:id="@+id/btn_main_to_calender"
         android:layout_width="wrap_content"

@@ -24,12 +24,6 @@
                 android:orientation="vertical">
 
                 <TextView
-                    style="@style/Text.App.CaptionBold"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="부대 게시판" />
-
-                <TextView
                     style="@style/Text.App.Title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -65,33 +59,20 @@
             android:paddingStart="8dp"
             android:paddingEnd="8dp" />
 
-        <TextView
-            style="@style/Text.App.CaptionBold"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:layout_marginBottom="6dp"
-            android:text="글 제목" />
-
         <EditText
             android:id="@+id/input_post_title"
             style="@style/Widget.App.Input"
-            android:hint="제목을 입력해주세요" />
-
-        <TextView
-            style="@style/Text.App.CaptionBold"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:layout_marginBottom="6dp"
-            android:text="내용" />
+            android:hint="제목" />
 
         <EditText
             android:id="@+id/input_post_body"
             style="@style/Widget.App.Input.Multiline"
-            android:layout_height="160dp"
-            android:hint="대원들과 나눌 내용을 작성해주세요"
-            android:maxLines="10" />
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:minHeight="240dp"
+            android:hint="내용"
+            android:maxLines="15" />
 
         <TextView
             android:id="@+id/btn_publish_post"

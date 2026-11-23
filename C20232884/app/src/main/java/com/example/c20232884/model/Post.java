@@ -10,6 +10,7 @@ public class Post {
     private String authorName;       // 작성자 이름/닉네임
     private String createdAt;        // 작성 일시
     private List<Comment> comments;  // 댓글 목록 (List 인터페이스 사용)
+    private int likes = 0;
 
     // 기본 생성자
     public Post() {
@@ -82,6 +83,14 @@ public class Post {
 
     public void setComments(List<Comment> comments) {
         this.comments = comments;
+    }
+
+    public int getLikes() {
+        return likes;
+    }
+
+    public void setLikes(int likes) {
+        this.likes = likes;
     }
 
 }

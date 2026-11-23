@@ -51,6 +51,26 @@
             android:textSize="12sp"
             android:textStyle="bold"
             tools:text="공지" />
+
+        <TextView
+            android:id="@+id/btn_delete_post"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/bg_badge_free"
+            android:backgroundTint="@color/personal_fill"
+            android:clickable="true"
+            android:contentDescription="게시글 삭제"
+            android:focusable="true"
+            android:paddingStart="10dp"
+            android:paddingTop="3dp"
+            android:paddingEnd="10dp"
+            android:paddingBottom="3dp"
+            android:text="삭제"
+            android:textColor="@color/danger"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
     </LinearLayout>
 
     <ScrollView
@@ -229,8 +249,13 @@
             style="@style/Widget.App.Input"
             android:layout_width="0dp"
             android:layout_weight="1"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
             android:hint="댓글을 입력해주세요"
-            android:imeOptions="actionSend" />
+            android:imeOptions="actionSend"
+            android:inputType="textShortMessage"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp" />
 
         <TextView
             android:id="@+id/btn_send_comment"
