@@ -1,34 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:background="@drawable/bg_card"
     android:clipToPadding="false"
-    android:padding="22dp">
+    android:fillViewport="true"
+    android:paddingStart="22dp"
+    android:paddingTop="22dp"
+    android:paddingEnd="22dp"
+    android:paddingBottom="40dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
+        <!-- 상단 헤더 (제목 & 닫기 버튼) -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
-            <LinearLayout
+            <TextView
+                style="@style/Text.App.Title"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:orientation="vertical">
-
-                <TextView
-                    style="@style/Text.App.Title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="새 글 작성" />
-            </LinearLayout>
+                android:text="새 글 작성" />
 
             <TextView
                 android:id="@+id/btn_close_compose"
@@ -43,41 +42,66 @@
                 android:textSize="18sp" />
         </LinearLayout>
 
-        <TextView
-            style="@style/Text.App.CaptionBold"
-            android:layout_width="wrap_content"
+        <!-- 카테고리(2/3) + 게시하기 버튼(1/3) 한 줄 수평 배치 -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:layout_marginBottom="6dp"
-            android:text="카테고리" />
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
-        <Spinner
-            android:id="@+id/spinner_category"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:background="@drawable/bg_input"
-            android:paddingStart="8dp"
-            android:paddingEnd="8dp" />
+            <Spinner
+                android:id="@+id/spinner_category"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="2"
+                android:background="@drawable/bg_input"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:popupBackground="@drawable/bg_card"
+                android:spinnerMode="dropdown" />
 
+            <TextView
+                android:id="@+id/btn_publish_post"
+                style="@style/Widget.App.PrimaryButton"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:text="게시하기" />
+        </LinearLayout>
+
+        <!-- 제목 입력란 -->
         <EditText
             android:id="@+id/input_post_title"
             style="@style/Widget.App.Input"
+            android:layout_marginTop="12dp"
             android:hint="제목" />
 
+        <!-- [수정] 제목과 본문 구분 가로선 (1dp) -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:background="@color/divider" />
+
+        <!-- [수정] 박스 테두리를 제거하고 2.5배 확대된 넉넉한 하단 여백(paddingBottom 120dp)을 확보한 본문 영역 -->
         <EditText
             android:id="@+id/input_post_body"
-            style="@style/Widget.App.Input.Multiline"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:minHeight="240dp"
-            android:hint="내용"
-            android:maxLines="15" />
-
-        <TextView
-            android:id="@+id/btn_publish_post"
-            style="@style/Widget.App.PrimaryButton"
-            android:layout_marginTop="16dp"
-            android:text="게시하기" />
+            android:background="@android:color/transparent"
+            android:gravity="top"
+            android:hint="내용을 작성해주세요"
+            android:inputType="textMultiLine"
+            android:lineSpacingExtra="4dp"
+            android:minHeight="320dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="120dp"
+            android:textColor="@color/text_primary"
+            android:textColorHint="@color/text_hint"
+            android:textSize="14sp" />
     </LinearLayout>
 </ScrollView>

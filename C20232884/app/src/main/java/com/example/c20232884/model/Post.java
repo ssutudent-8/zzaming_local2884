@@ -1,4 +1,5 @@
 package com.example.c20232884.model;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,22 +12,28 @@ public class Post {
     private String createdAt;        // 작성 일시
     private List<Comment> comments;  // 댓글 목록 (List 인터페이스 사용)
     private int likes = 0;
+    private String category;         // 카테고리 ("공지", "자유", "질문", "마음의 편지")
 
     // 기본 생성자
     public Post() {
         this.comments = new ArrayList<>();
+        this.category = "자유";
     }
 
-    // 전체 필드 초기화 생성자
-    public Post(String postId, String title, String content, String authorUid, String authorName, String createdAt, List<Comment> comments) {
+    // 전체 필드 초기화 생성자 (category 호환)
+    public Post(String postId, String title, String content, String authorUid, String authorName, String createdAt, List<Comment> comments, String category) {
         this.postId = postId;
         this.title = title;
         this.content = content;
         this.authorUid = authorUid;
         this.authorName = authorName;
         this.createdAt = createdAt;
-        // 넘겨받은 comments가 null일 경우를 대비한 널 체크 안전 코드
         this.comments = (comments != null) ? comments : new ArrayList<>();
+        this.category = (category != null) ? category : "자유";
+    }
+
+    public Post(String postId, String title, String content, String authorUid, String authorName, String createdAt, List<Comment> comments) {
+        this(postId, title, content, authorUid, authorName, createdAt, comments, "자유");
     }
 
     public String getPostId() {
@@ -93,4 +100,11 @@ public class Post {
         this.likes = likes;
     }
 
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
 }

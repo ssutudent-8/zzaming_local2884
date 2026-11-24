@@ -48,7 +48,7 @@ public class CalendarActivity extends AppCompatActivity {
     private android.content.BroadcastReceiver dateChangeReceiver;
 
     // 유저 권한 및 복무 기간 타임스탬프 변수
-    private String userType = "병사"; // 기본값: "병사" ("병사" 또는 "간부")
+    private String memberType = "병사"; // 기본값: "병사" ("병사" 또는 "간부")
     private long enlistmentMillis = 0;
     private long dischargeMillis = 0;
 
@@ -70,9 +70,9 @@ public class CalendarActivity extends AppCompatActivity {
             return insets;
         });
 
-        String passedUserType = getIntent().getStringExtra("userType");
-        if (passedUserType != null) {
-            userType = passedUserType;
+        String passedMemberType = getIntent().getStringExtra("memberType");
+        if (passedMemberType != null) {
+            memberType = passedMemberType;
         }
 
         binding.btnYear.setOnClickListener(v -> toggleYearView());
@@ -275,7 +275,7 @@ public class CalendarActivity extends AppCompatActivity {
                     String dischargeDate = String.format(Locale.KOREA, "%04d-%02d-%02d", year, month + 1, dayOfMonth);
                     Toast.makeText(this, "전역일: " + dischargeDate, Toast.LENGTH_SHORT).show();
                     generateServiceMonthList(startYear, startMonth, year, month);
-                    showUserTypeSelectionDialog();
+                    showMemberTypeSelectionDialog();
                 },
                 startYear + 1, startMonth + 6, 15
         );
@@ -286,13 +286,13 @@ public class CalendarActivity extends AppCompatActivity {
     /**
      * 사용자 유형("병사" / "간부") 선택 다이얼로그
      */
-    private void showUserTypeSelectionDialog() {
+    private void showMemberTypeSelectionDialog() {
         String[] options = {"병사", "간부"};
         new AlertDialog.Builder(this)
                 .setTitle("사용자 유형을 선택하세요")
-                .setSingleChoiceItems(options, "간부".equals(userType) ? 1 : 0, (dialog, which) -> {
-                    userType = options[which];
-                    Toast.makeText(this, "유저 타입: " + userType + "(으)로 설정되었습니다.", Toast.LENGTH_SHORT).show();
+                .setSingleChoiceItems(options, "간부".equals(memberType) ? 1 : 0, (dialog, which) -> {
+                    memberType = options[which];
+                    Toast.makeText(this, "유저 타입: " + memberType + "(으)로 설정되었습니다.", Toast.LENGTH_SHORT).show();
                     dialog.dismiss();
                     updateCalendarView();
                 })
@@ -538,6 +538,8 @@ public class CalendarActivity extends AppCompatActivity {
 
         if (foundIndex != -1) {
             currentMonthIndex = foundIndex;
+            // [수정] 오늘 버튼 클릭 시 해당 월 이동과 동시에 오늘 날짜(selectedFullDate)를 유일 선택 상태로 강조
+            selectedFullDate = String.format(Locale.KOREA, "%04d-%02d-%02d", todayYear, todayMonth + 1, todayDay);
             selectedDayNumber = String.valueOf(todayDay);
             updateCalendarView();
         } else {
@@ -689,7 +691,7 @@ public class CalendarActivity extends AppCompatActivity {
 
         // 권한별 일정 유형 스피너 항목 세팅 (간부: 부대/개인/휴가, 병사: 개인/휴가)
         List<String> types = new ArrayList<>();
-        if ("간부".equals(userType)) {
+        if ("간부".equals(memberType)) {
             types.add("부대");
         }
         types.add("개인");
@@ -746,7 +748,7 @@ public class CalendarActivity extends AppCompatActivity {
             }
 
             // 간부 유저가 '부대' 일정을 등록할 경우 더미 서버(MockServerDataSource)에도 게시/저장
-            if ("간부".equals(userType) && "부대".equals(selectedType)) {
+            if ("간부".equals(memberType) && "부대".equals(selectedType)) {
                 MockServerDataSource.getInstance().publishUnitSchedule(newItem);
             }
 
@@ -799,7 +801,7 @@ public class CalendarActivity extends AppCompatActivity {
         final String[] currentDateHolder = {originalDate};
 
         // 개인 일정(또는 간부)인 경우 제목 터치 시 제목 수정 다이얼로그 연동
-        boolean canEditTitle = "개인".equals(item.getType()) || ("간부".equals(userType) && "부대".equals(item.getType()));
+        boolean canEditTitle = "개인".equals(item.getType()) || ("간부".equals(memberType) && "부대".equals(item.getType()));
         if (canEditTitle) {
             dialogBinding.tvDetailTitle.setOnClickListener(v -> {
                 android.widget.EditText inputTitle = new android.widget.EditText(this);
@@ -823,7 +825,7 @@ public class CalendarActivity extends AppCompatActivity {
         }
 
         // 날짜 수정 권한 판별
-        boolean canEditDate = "개인".equals(item.getType()) || ("간부".equals(userType) && "부대".equals(item.getType()));
+        boolean canEditDate = "개인".equals(item.getType()) || ("간부".equals(memberType) && "부대".equals(item.getType()));
 
         if (!originalDate.isEmpty()) {
             dialogBinding.tvFixedMessage.setVisibility(View.VISIBLE);
@@ -891,7 +893,7 @@ public class CalendarActivity extends AppCompatActivity {
         });
 
         // 삭제 권한 판별 (개인 일정 OR 간부 권한의 부대 일정)
-        boolean canDelete = "개인".equals(item.getType()) || ("간부".equals(userType) && "부대".equals(item.getType()));
+        boolean canDelete = "개인".equals(item.getType()) || ("간부".equals(memberType) && "부대".equals(item.getType()));
         if (canDelete) {
             dialogBinding.btnDeleteSchedule.setVisibility(View.VISIBLE);
             dialogBinding.btnDeleteSchedule.setOnClickListener(v -> {

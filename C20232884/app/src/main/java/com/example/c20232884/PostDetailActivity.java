@@ -1,5 +1,6 @@
 package com.example.c20232884;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
@@ -8,6 +9,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.c20232884.databinding.ActivityPostDetailBinding;
 import com.example.c20232884.model.Comment;
+import com.example.c20232884.model.User;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 게시글 본문 상세 조회, 좋아요 및 댓글 실시간 작성을 담당하는 액티비티 클래스
@@ -17,7 +23,7 @@ public class PostDetailActivity extends AppCompatActivity {
     private ActivityPostDetailBinding binding;
     private int likeCount = 0;
     private boolean isLiked = false;
-    private java.util.List<Comment> commentList = new java.util.ArrayList<>();
+    private final List<Comment> commentList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,11 +32,22 @@ public class PostDetailActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         // 전달받은 게시글 정보 세팅
-        String postId = getIntent().getStringExtra("postId");
-        String title = getIntent().getStringExtra("postTitle");
-        String content = getIntent().getStringExtra("postContent");
-        String author = getIntent().getStringExtra("postAuthor");
-        String time = getIntent().getStringExtra("postTime");
+        Intent intent = getIntent();
+        String postId = intent.getStringExtra("postId");
+        String title = intent.getStringExtra("postTitle");
+        String content = intent.getStringExtra("postContent");
+        String author = intent.getStringExtra("postAuthor");
+        String time = intent.getStringExtra("postTime");
+
+        // 전달받은 기존 댓글 수신
+        Serializable passedCommentsObj = intent.getSerializableExtra("postComments");
+        if (passedCommentsObj instanceof List) {
+            commentList.clear();
+            commentList.addAll((List<Comment>) passedCommentsObj);
+        } else if (commentList.isEmpty()) {
+            commentList.add(new Comment("c1", "u_soldier_02", "이일병", "체육대회 일정 확인했습니다!", "1시간 전"));
+            commentList.add(new Comment("c2", "u_soldier_03", "박상병", "준비물 챙기겠습니다.", "30분 전"));
+        }
 
         binding.tvPostTitle.setText(title != null ? title : "게시글 제목");
         binding.tvPostBody.setText(content != null ? content : "본문 내용");
@@ -42,8 +59,13 @@ public class PostDetailActivity extends AppCompatActivity {
         }
 
         // 유저 권한 정보 및 게시글 삭제 권한 (간부 유저 또는 행정반/본인 작성자)
-        String userType = getIntent().getStringExtra("userType");
-        boolean canDeletePost = "간부".equals(userType) || "행정반".equals(author);
+        String postAuthorUid = intent.getStringExtra("postAuthorUid");
+        User currentUser = MockServerDataSource.getInstance().getCurrentUser();
+
+        boolean isOfficer = "간부".equals(currentUser.getMemberType());
+        boolean isMyPost = (postAuthorUid != null && postAuthorUid.equals(currentUser.getUserId()))
+                || currentUser.getUserName().equals(author);
+        boolean canDeletePost = isOfficer || isMyPost;
 
         if (canDeletePost) {
             binding.btnDeletePost.setVisibility(View.VISIBLE);
@@ -52,7 +74,7 @@ public class PostDetailActivity extends AppCompatActivity {
                         .setTitle("게시글 삭제")
                         .setMessage("정말로 이 게시글을 삭제하시겠습니까?")
                         .setPositiveButton("삭제", (dialog, which) -> {
-                            android.content.Intent resultIntent = new android.content.Intent();
+                            Intent resultIntent = new Intent();
                             resultIntent.putExtra("postId", postId);
                             resultIntent.putExtra("isDeleted", true);
                             setResult(RESULT_OK, resultIntent);
@@ -68,10 +90,11 @@ public class PostDetailActivity extends AppCompatActivity {
 
         // 뒤로가기
         binding.btnBack.setOnClickListener(v -> {
-            android.content.Intent resultIntent = new android.content.Intent();
+            Intent resultIntent = new Intent();
             resultIntent.putExtra("postId", postId);
             resultIntent.putExtra("updatedLikeCount", likeCount);
             resultIntent.putExtra("updatedCommentCount", commentList.size());
+            resultIntent.putExtra("updatedComments", (Serializable) commentList);
             setResult(RESULT_OK, resultIntent);
             finish();
         });
@@ -93,10 +116,7 @@ public class PostDetailActivity extends AppCompatActivity {
             updateLikeButtonUI();
         });
 
-        // 댓글 리사이클러뷰(rv_comments)에 CommentAdapter 연결
-        commentList.add(new Comment("c1", "u2", "이일병", "체육대회 일정 확인했습니다!", "1시간 전"));
-        commentList.add(new Comment("c2", "u3", "박상병", "준비물 챙기겠습니다.", "30분 전"));
-
+        // 댓글 리사이클러뷰 연결
         CommentAdapter commentAdapter = new CommentAdapter(commentList);
 
         commentAdapter.setOnCommentDeleteListener((position, comment) -> {
@@ -119,7 +139,7 @@ public class PostDetailActivity extends AppCompatActivity {
         binding.rvComments.setAdapter(commentAdapter);
         binding.tvCommentTotal.setText(String.valueOf(commentList.size()));
 
-        // [수정] 댓글 입력 후 등록 클릭 시 목록에 실시간 추가
+        // 댓글 등록 버튼
         binding.btnSendComment.setOnClickListener(v -> {
             String commentText = binding.inputComment.getText().toString().trim();
             if (commentText.isEmpty()) {
@@ -127,7 +147,7 @@ public class PostDetailActivity extends AppCompatActivity {
                 return;
             }
 
-            Comment newComment = new Comment("c_" + System.currentTimeMillis(), "u1", "김병장", commentText, "방금 전");
+            Comment newComment = new Comment("c_" + System.currentTimeMillis(), currentUser.getUserId(), currentUser.getUserName(), commentText, "방금 전");
             commentList.add(newComment);
             commentAdapter.notifyItemInserted(commentList.size() - 1);
             binding.tvCommentTotal.setText(String.valueOf(commentList.size()));
@@ -138,10 +158,9 @@ public class PostDetailActivity extends AppCompatActivity {
     }
 
     private void updateLikeButtonUI() {
-        binding.btnLike.setSelected(isLiked); // 셀렉터 상태값 적용 (빨간색 ↔ 회색 전환)
+        binding.btnLike.setSelected(isLiked);
         binding.btnLike.setText((isLiked ? "◆ 좋아요 " : "◇ 좋아요 ") + likeCount);
         int colorRes = isLiked ? R.color.personal : R.color.text_secondary;
         binding.btnLike.setTextColor(androidx.core.content.ContextCompat.getColor(this, colorRes));
     }
-
 }

@@ -79,11 +79,16 @@
                 android:textSize="12sp"
                 android:textStyle="bold" />
 
+            <!-- [수정] 한 줄에 깔끔히 들어가도록 글자 크기(13sp) 및 단일 행(maxLines=1) 설정 -->
             <TextView
+                android:id="@+id/tv_post_sub_title"
                 style="@style/Text.App.Title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="대원들과 소식을 나눠요" />
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="대원들과 소식을 나눠요"
+                android:textSize="13sp" />
         </LinearLayout>
 
         <TextView
@@ -96,6 +101,7 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/layout_filter_tabs"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"

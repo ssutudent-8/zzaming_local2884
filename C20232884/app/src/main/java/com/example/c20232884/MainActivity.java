@@ -20,7 +20,7 @@ import java.util.Locale;
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
-    private String userType = "병사";
+    private String memberType = "병사";
     private int startYear = 2025;
     private int startMonth = 5; // 6월 (0이 1월)
     private int endYear = 2026;
@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
 
         binding.btnMainToCalender.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, CalendarActivity.class);
-            intent.putExtra("userType", userType);
+            intent.putExtra("memberType", memberType);
             intent.putExtra("startYear", startYear);
             intent.putExtra("startMonth", startMonth);
             intent.putExtra("endYear", endYear);
@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
 
         binding.btnMainToBoard.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, PostActivity.class);
-            intent.putExtra("userType", userType);
+            intent.putExtra("memberType", memberType);
             startActivity(intent);
         });
     }
@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
                     this.endMonth = month;
                     String dischargeDate = String.format(Locale.KOREA, "%04d-%02d-%02d", year, month + 1, dayOfMonth);
                     Toast.makeText(this, "전역일: " + dischargeDate, Toast.LENGTH_SHORT).show();
-                    showUserTypeSelectionDialog();
+                    showMemberTypeSelectionDialog();
                 },
                 enlistYear + 1, enlistMonth + 6, 15
         );
@@ -92,9 +92,9 @@ public class MainActivity extends AppCompatActivity {
         dialog.show();
     }
 
-    private void showUserTypeSelectionDialog() {
+    private void showMemberTypeSelectionDialog() {
         String[] options = {"병사", "간부"};
-        final int[] selectedChoice = {"간부".equals(userType) ? 1 : 0};
+        final int[] selectedChoice = {"간부".equals(memberType) ? 1 : 0};
 
         new AlertDialog.Builder(this)
                 .setTitle("사용자 유형을 선택하세요")
@@ -102,8 +102,9 @@ public class MainActivity extends AppCompatActivity {
                     selectedChoice[0] = which;
                 })
                 .setPositiveButton("확인", (dialog, which) -> {
-                    userType = options[selectedChoice[0]];
-                    Toast.makeText(this, "유저 타입: " + userType + "(으)로 설정되었습니다.", Toast.LENGTH_SHORT).show();
+                    memberType = options[selectedChoice[0]];
+                    MockServerDataSource.getInstance().selectMemberType(memberType);
+                    Toast.makeText(this, "유저 타입: " + memberType + "(으)로 설정되었습니다.", Toast.LENGTH_SHORT).show();
                     dialog.dismiss();
                 })
                 .setNegativeButton("취소", null)

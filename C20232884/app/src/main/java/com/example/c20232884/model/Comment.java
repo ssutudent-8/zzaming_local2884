@@ -1,6 +1,10 @@
 package com.example.c20232884.model;
 
-public class Comment {
+import java.io.Serializable;
+
+public class Comment implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private String commentId;   // 댓글 식별 ID
     private String authorUid;   // 댓글 작성자 UID
     private String authorName;  // 댓글 작성자 이름/닉네임
@@ -59,5 +63,4 @@ public class Comment {
     public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
     }
-
 }
