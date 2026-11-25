@@ -605,8 +605,18 @@ public class CalendarActivity extends AppCompatActivity {
      */
     private void initDummySchedules() {
         allScheduleList.clear();
-        // 1. 더미 서버 DB(MockServerDataSource)로부터 부대 공유 일정 동기화 수신
-        allScheduleList.addAll(MockServerDataSource.getInstance().fetchServerUnitSchedules());
+        MockServerDataSource.getInstance(this).fetchServerUnitSchedules(new MockServerDataSource.OnScheduleLoadListener() {
+            @Override
+            public void onSuccess(List<ScheduleItem> scheduleList) {
+                if (scheduleList != null) {
+                    allScheduleList.addAll(scheduleList);
+                }
+                updateCalendarView();
+            }
+
+            @Override
+            public void onFailure(Exception e) {}
+        });
 
         // 2. 로컬 개인/휴가 일정 추가
         allScheduleList.add(new ScheduleItem("2026-10-09", "한글날 위로휴가", "00:00", "23:59", "자택", "휴가", "휴가증 지참"));

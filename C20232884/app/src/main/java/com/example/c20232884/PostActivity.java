@@ -38,47 +38,16 @@ public class PostActivity extends AppCompatActivity {
     // 새 글 작성 수신 런처
     private final ActivityResultLauncher<Intent> composeLauncher =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-                if (result.getResultCode() == RESULT_OK && result.getData() != null) {
-                    Intent data = result.getData();
-                    String title = data.getStringExtra("newPostTitle");
-                    String body = data.getStringExtra("newPostBody");
-                    String author = data.getStringExtra("newPostAuthor");
-                    String category = data.getStringExtra("newPostCategory");
-
-                    Post newPost = new Post("p_" + System.currentTimeMillis(), title, body, "", author, "방금 전", new ArrayList<>(), category);
-                    postList.add(0, newPost);
-                    filterPostsByCategory(currentCategory);
+                if (result.getResultCode() == RESULT_OK) {
+                    loadPostsFromServer();
                 }
             });
 
     // 게시글 상세 & 삭제 수신 런처
     private final ActivityResultLauncher<Intent> detailLauncher =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-                if (result.getResultCode() == RESULT_OK && result.getData() != null) {
-                    Intent data = result.getData();
-                    String postId = data.getStringExtra("postId");
-                    boolean isDeleted = data.getBooleanExtra("isDeleted", false);
-                    int newLikeCount = data.getIntExtra("updatedLikeCount", -1);
-
-                    if (postId != null && !postId.isEmpty()) {
-                        for (int i = 0; i < postList.size(); i++) {
-                            Post post = postList.get(i);
-                            if (postId.equals(post.getPostId())) {
-                                if (isDeleted) {
-                                    postList.remove(i);
-                                    Toast.makeText(this, "게시글이 삭제되었습니다.", Toast.LENGTH_SHORT).show();
-                                } else {
-                                    if (newLikeCount != -1) post.setLikes(newLikeCount);
-                                    java.io.Serializable updatedCommentsObj = data.getSerializableExtra("updatedComments");
-                                    if (updatedCommentsObj instanceof java.util.List) {
-                                        post.setComments((java.util.List<Comment>) updatedCommentsObj);
-                                    }
-                                }
-                                filterPostsByCategory(currentCategory);
-                                break;
-                            }
-                        }
-                    }
+                if (result.getResultCode() == RESULT_OK) {
+                    loadPostsFromServer();
                 }
             });
 
@@ -108,7 +77,7 @@ public class PostActivity extends AppCompatActivity {
             binding.btnInbox.setOnClickListener(v -> {
                 String currentBtnText = binding.btnInbox.getText().toString();
                 if ("마음의 편지함".equals(currentBtnText)) {
-                    // [수정] 마음의 편지함 진입 2차 확인 다이얼로그
+                    // 마음의 편지함 진입 2차 확인 다이얼로그
                     new AlertDialog.Builder(this)
                             .setTitle("마음의 편지 수신함 진입")
                             .setMessage("무기명 보안 수신함으로 이동하시겠습니까?\n(외부 유출 주의해 주시기 바랍니다)")
@@ -124,7 +93,7 @@ public class PostActivity extends AppCompatActivity {
                             .setNegativeButton("취소", null)
                             .show();
                 } else {
-                    // [수정] 부대 게시판 복귀 2차 확인 다이얼로그
+                    // 부대 게시판 복귀 2차 확인 다이얼로그
                     new AlertDialog.Builder(this)
                             .setTitle("부대 게시판 이동")
                             .setMessage("일반 부대 게시판으로 돌아가시겠습니까?")
@@ -140,14 +109,14 @@ public class PostActivity extends AppCompatActivity {
             binding.btnInbox.setVisibility(View.GONE);
         }
 
-        initDummyPosts();
-
-        filteredPostList = new ArrayList<>(postList);
+        postList = new ArrayList<>();
+        filteredPostList = new ArrayList<>();
         postAdapter = new PostAdapter(filteredPostList);
         binding.rvPosts.setLayoutManager(new LinearLayoutManager(this));
         binding.rvPosts.setAdapter(postAdapter);
 
         setupFilterTabs();
+        loadPostsFromServer();
 
         binding.btnCompose.setOnClickListener(v -> {
             Intent intent = new Intent(PostActivity.this, PostComposeActivity.class);
@@ -157,10 +126,11 @@ public class PostActivity extends AppCompatActivity {
 
         postAdapter.setOnItemClickListener(post -> {
             Intent intent = new Intent(PostActivity.this, PostDetailActivity.class);
-            intent.putExtra("postId", post.getPostId());
+            intent.putExtra("postId", post.getId());
             intent.putExtra("postTitle", post.getTitle());
             intent.putExtra("postContent", post.getContent());
             intent.putExtra("postAuthor", post.getAuthorName());
+            intent.putExtra("postAuthorUid", post.getAuthorUid());
             intent.putExtra("postTime", post.getCreatedAt());
             intent.putExtra("memberType", memberType);
 
@@ -171,34 +141,22 @@ public class PostActivity extends AppCompatActivity {
         });
     }
 
-    private void initDummyPosts() {
-        postList = new ArrayList<>();
+    private void loadPostsFromServer() {
+        MockServerDataSource.getInstance(this).fetchServerPosts(new MockServerDataSource.OnPostLoadListener() {
+            @Override
+            public void onSuccess(List<Post> posts) {
+                postList.clear();
+                if (posts != null) {
+                    postList.addAll(posts);
+                }
+                filterPostsByCategory(currentCategory);
+            }
 
-        List<Comment> comments1 = new ArrayList<>();
-        comments1.add(new Comment("c1", "user2", "이일병", "체육대회 일정 확인했습니다!", "1시간 전"));
-        comments1.add(new Comment("c2", "user3", "박상병", "준비물 챙기겠습니다.", "30분 전"));
-
-        postList.add(new Post(
-                "p1",
-                "6월 대대 체육대회 및 일정 안내",
-                "이번 주 금요일 대대 전투체육 일정 안내드립니다. 모두 전투복 및 운동화 착용 바랍니다.",
-                "u_officer_01",
-                "행정관",
-                "1시간 전",
-                comments1,
-                "공지"
-        ));
-
-        postList.add(new Post(
-                "p2",
-                "마음의 편지함 점검 안내",
-                "익명성이 보장되는 부대 개선 마음의 편지함이 열려 있으니 많은 의견 바랍니다.",
-                "u_officer_01",
-                "행정관",
-                "3시간 전",
-                new ArrayList<>(),
-                "공지"
-        ));
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(PostActivity.this, "게시글 불러오기 실패", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void setupFilterTabs() {

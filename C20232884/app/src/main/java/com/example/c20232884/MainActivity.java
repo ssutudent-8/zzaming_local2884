@@ -40,6 +40,12 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
+        // 더미 서버 및 SharedPreferences 영구 저장소 초기화
+        MockServerDataSource.getInstance(getApplicationContext());
+        if (MockServerDataSource.getInstance().getCurrentUser() != null) {
+            memberType = MockServerDataSource.getInstance().getCurrentUser().getMemberType();
+        }
+
         // 복무 및 권한 설정 버튼
         binding.btnMainSetting.setOnClickListener(v -> showEnlistmentDatePicker());
 

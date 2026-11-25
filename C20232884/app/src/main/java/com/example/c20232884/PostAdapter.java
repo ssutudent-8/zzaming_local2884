@@ -71,8 +71,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
             holder.binding.tvPostBody.setText(post.getContent());
             holder.binding.tvPostMeta.setText(post.getAuthorName() + " · " + post.getCreatedAt());
 
-            int commentCount = (post.getComments() != null) ? post.getComments().size() : 0;
-            holder.binding.btnPostComment.setText("댓글 " + commentCount);
+            holder.binding.btnPostComment.setText("댓글 " + post.getCommentCount());
             holder.binding.btnPostLike.setText("좋아요 " + post.getLikes());
         }
 

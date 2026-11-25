@@ -39,14 +39,25 @@ public class PostDetailActivity extends AppCompatActivity {
         String author = intent.getStringExtra("postAuthor");
         String time = intent.getStringExtra("postTime");
 
-        // 전달받은 기존 댓글 수신
+        // 전달받은 기존 댓글 또는 서버 동기화 댓글 수신
         Serializable passedCommentsObj = intent.getSerializableExtra("postComments");
         if (passedCommentsObj instanceof List) {
             commentList.clear();
             commentList.addAll((List<Comment>) passedCommentsObj);
-        } else if (commentList.isEmpty()) {
-            commentList.add(new Comment("c1", "u_soldier_02", "이일병", "체육대회 일정 확인했습니다!", "1시간 전"));
-            commentList.add(new Comment("c2", "u_soldier_03", "박상병", "준비물 챙기겠습니다.", "30분 전"));
+        } else {
+            MockServerDataSource.getInstance(this).fetchCommentsForPost(postId, new MockServerDataSource.OnCommentLoadListener() {
+                @Override
+                public void onSuccess(List<Comment> comments) {
+                    commentList.clear();
+                    if (comments != null) {
+                        commentList.addAll(comments);
+                    }
+                    binding.tvCommentTotal.setText(String.valueOf(commentList.size()));
+                }
+
+                @Override
+                public void onFailure(Exception e) {}
+            });
         }
 
         binding.tvPostTitle.setText(title != null ? title : "게시글 제목");
@@ -60,10 +71,10 @@ public class PostDetailActivity extends AppCompatActivity {
 
         // 유저 권한 정보 및 게시글 삭제 권한 (간부 유저 또는 행정반/본인 작성자)
         String postAuthorUid = intent.getStringExtra("postAuthorUid");
-        User currentUser = MockServerDataSource.getInstance().getCurrentUser();
+        User currentUser = MockServerDataSource.getInstance(this).getCurrentUser();
 
         boolean isOfficer = "간부".equals(currentUser.getMemberType());
-        boolean isMyPost = (postAuthorUid != null && postAuthorUid.equals(currentUser.getUserId()))
+        boolean isMyPost = (postAuthorUid != null && postAuthorUid.equals(currentUser.getId()))
                 || currentUser.getUserName().equals(author);
         boolean canDeletePost = isOfficer || isMyPost;
 
@@ -74,12 +85,22 @@ public class PostDetailActivity extends AppCompatActivity {
                         .setTitle("게시글 삭제")
                         .setMessage("정말로 이 게시글을 삭제하시겠습니까?")
                         .setPositiveButton("삭제", (dialog, which) -> {
-                            Intent resultIntent = new Intent();
-                            resultIntent.putExtra("postId", postId);
-                            resultIntent.putExtra("isDeleted", true);
-                            setResult(RESULT_OK, resultIntent);
-                            Toast.makeText(this, "게시글이 삭제되었습니다.", Toast.LENGTH_SHORT).show();
-                            finish();
+                            MockServerDataSource.getInstance(this).deletePost(postId, new MockServerDataSource.OnCompleteListener() {
+                                @Override
+                                public void onSuccess() {
+                                    Intent resultIntent = new Intent();
+                                    resultIntent.putExtra("postId", postId);
+                                    resultIntent.putExtra("isDeleted", true);
+                                    setResult(RESULT_OK, resultIntent);
+                                    Toast.makeText(PostDetailActivity.this, "게시글이 삭제되었습니다.", Toast.LENGTH_SHORT).show();
+                                    finish();
+                                }
+
+                                @Override
+                                public void onFailure(Exception e) {
+                                    Toast.makeText(PostDetailActivity.this, "게시글 삭제 실패", Toast.LENGTH_SHORT).show();
+                                }
+                            });
                         })
                         .setNegativeButton("취소", null)
                         .show();
@@ -114,6 +135,7 @@ public class PostDetailActivity extends AppCompatActivity {
                 Toast.makeText(this, "좋아요를 눌렀습니다.", Toast.LENGTH_SHORT).show();
             }
             updateLikeButtonUI();
+            MockServerDataSource.getInstance(this).updatePostLikes(postId, likeCount, null);
         });
 
         // 댓글 리사이클러뷰 연결
@@ -125,9 +147,11 @@ public class PostDetailActivity extends AppCompatActivity {
                     .setMessage("댓글을 삭제하시겠습니까?")
                     .setPositiveButton("삭제", (dialog, which) -> {
                         if (position >= 0 && position < commentList.size()) {
+                            Comment targetComment = commentList.get(position);
                             commentList.remove(position);
                             commentAdapter.notifyItemRemoved(position);
                             binding.tvCommentTotal.setText(String.valueOf(commentList.size()));
+                            MockServerDataSource.getInstance(this).deleteCommentFromPost(postId, targetComment.getId(), null);
                             Toast.makeText(this, "댓글이 삭제되었습니다.", Toast.LENGTH_SHORT).show();
                         }
                     })
@@ -147,10 +171,11 @@ public class PostDetailActivity extends AppCompatActivity {
                 return;
             }
 
-            Comment newComment = new Comment("c_" + System.currentTimeMillis(), currentUser.getUserId(), currentUser.getUserName(), commentText, "방금 전");
+            Comment newComment = new Comment("c_" + System.currentTimeMillis(), postId, currentUser.getId(), currentUser.getUserName(), commentText, "방금 전");
             commentList.add(newComment);
             commentAdapter.notifyItemInserted(commentList.size() - 1);
             binding.tvCommentTotal.setText(String.valueOf(commentList.size()));
+            MockServerDataSource.getInstance(this).addCommentToPost(postId, newComment, null);
 
             binding.inputComment.setText("");
             Toast.makeText(this, "댓글이 등록되었습니다.", Toast.LENGTH_SHORT).show();

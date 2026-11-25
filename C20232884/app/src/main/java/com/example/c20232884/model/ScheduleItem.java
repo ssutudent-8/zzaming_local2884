@@ -1,18 +1,19 @@
 package com.example.c20232884.model;
 
 public class ScheduleItem {
+    private String id;        // 일정 고유 ID (id)
     private String date;      // 날짜 (예: "2025-03-30")
     private String title;     // 일정 제목 (예: "야간 경계근무")
-    private String startTime;   // 시작 시간 (예: "19:00")
-    private String endTime;     // 종료 시간 (예: "20:00")
+    private String startTime; // 시작 시간 (예: "19:00")
+    private String endTime;   // 종료 시간 (예: "20:00")
     private String location;  // 장소 (예: "초소 A")
     private String type;      // 일정 유형 (예: "개인", "부대", "휴가")
     private String memo;      // 메모/비고 (예: "방한용품 착용")
 
     public ScheduleItem() {}
 
-    public ScheduleItem(String date, String title, String startTime, String endTime, String location, String type, String memo)
-    {
+    public ScheduleItem(String id, String date, String title, String startTime, String endTime, String location, String type, String memo) {
+        this.id = id;
         this.date = date;
         this.title = title;
         this.startTime = startTime;
@@ -20,6 +21,18 @@ public class ScheduleItem {
         this.location = location;
         this.type = type;
         this.memo = memo;
+    }
+
+    public ScheduleItem(String date, String title, String startTime, String endTime, String location, String type, String memo) {
+        this("sched_" + System.currentTimeMillis(), date, title, startTime, endTime, location, type, memo);
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     // 리스트 표출용 시간 범위 반환 헬퍼 메서드 ("19:00 ~ 20:00")
@@ -90,5 +103,4 @@ public class ScheduleItem {
     public void setMemo(String memo) {
         this.memo = memo;
     }
-
 }

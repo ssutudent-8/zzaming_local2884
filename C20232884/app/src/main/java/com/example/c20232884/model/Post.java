@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Post {
-    private String postId;           // 게시글 고유 ID
+    private String id;               // 게시글 고유 ID
     private String title;            // 게시글 제목
     private String content;          // 게시글 본문 내용
     private String authorUid;        // 작성자 UID (유저 구분용)
     private String authorName;       // 작성자 이름/닉네임
     private String createdAt;        // 작성 일시
-    private List<Comment> comments;  // 댓글 목록 (List 인터페이스 사용)
+    private List<Comment> comments;  // 댓글 목록
     private int likes = 0;
     private String category;         // 카테고리 ("공지", "자유", "질문", "마음의 편지")
 
@@ -20,9 +20,9 @@ public class Post {
         this.category = "자유";
     }
 
-    // 전체 필드 초기화 생성자 (category 호환)
-    public Post(String postId, String title, String content, String authorUid, String authorName, String createdAt, List<Comment> comments, String category) {
-        this.postId = postId;
+    // 전체 필드 초기화 생성자
+    public Post(String id, String title, String content, String authorUid, String authorName, String createdAt, List<Comment> comments, String category) {
+        this.id = id;
         this.title = title;
         this.content = content;
         this.authorUid = authorUid;
@@ -32,16 +32,16 @@ public class Post {
         this.category = (category != null) ? category : "자유";
     }
 
-    public Post(String postId, String title, String content, String authorUid, String authorName, String createdAt, List<Comment> comments) {
-        this(postId, title, content, authorUid, authorName, createdAt, comments, "자유");
+    public Post(String id, String title, String content, String authorUid, String authorName, String createdAt, List<Comment> comments) {
+        this(id, title, content, authorUid, authorName, createdAt, comments, "자유");
     }
 
-    public String getPostId() {
-        return postId;
+    public String getId() {
+        return id;
     }
 
-    public void setPostId(String postId) {
-        this.postId = postId;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getTitle() {
@@ -90,6 +90,10 @@ public class Post {
 
     public void setComments(List<Comment> comments) {
         this.comments = comments;
+    }
+
+    public int getCommentCount() {
+        return (comments != null) ? comments.size() : 0;
     }
 
     public int getLikes() {

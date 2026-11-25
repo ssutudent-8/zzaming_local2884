@@ -116,7 +116,7 @@ public class PostComposeActivity extends AppCompatActivity {
             boolean isAnonymous = "마음의 편지".equals(selectedCategory);
             com.example.c20232884.model.User currentUser = MockServerDataSource.getInstance().getCurrentUser();
             String authorName = isAnonymous ? "익명" : currentUser.getUserName();
-            String authorId = isAnonymous ? "" : currentUser.getUserId();
+            String authorId = isAnonymous ? "" : currentUser.getId();
 
             Post newPost = new Post(
                     "p_" + System.currentTimeMillis(),
@@ -129,15 +129,25 @@ public class PostComposeActivity extends AppCompatActivity {
                     selectedCategory
             );
 
-            Intent resultIntent = new Intent();
-            resultIntent.putExtra("newPostTitle", newPost.getTitle());
-            resultIntent.putExtra("newPostBody", newPost.getContent());
-            resultIntent.putExtra("newPostAuthor", newPost.getAuthorName());
-            resultIntent.putExtra("newPostCategory", selectedCategory);
-            setResult(RESULT_OK, resultIntent);
+            MockServerDataSource.getInstance(this).publishPost(newPost, new MockServerDataSource.OnCompleteListener() {
+                @Override
+                public void onSuccess() {
+                    Intent resultIntent = new Intent();
+                    resultIntent.putExtra("newPostTitle", newPost.getTitle());
+                    resultIntent.putExtra("newPostBody", newPost.getContent());
+                    resultIntent.putExtra("newPostAuthor", newPost.getAuthorName());
+                    resultIntent.putExtra("newPostCategory", selectedCategory);
+                    setResult(RESULT_OK, resultIntent);
 
-            Toast.makeText(this, isAnonymous ? "익명 마음의 편지가 작성되었습니다." : "게시글이 등록되었습니다.", Toast.LENGTH_SHORT).show();
-            finish();
+                    Toast.makeText(PostComposeActivity.this, isAnonymous ? "익명 마음의 편지가 작성되었습니다." : "게시글이 등록되었습니다.", Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                    Toast.makeText(PostComposeActivity.this, "게시글 작성에 실패했습니다.", Toast.LENGTH_SHORT).show();
+                }
+            });
         });
     }
 }
