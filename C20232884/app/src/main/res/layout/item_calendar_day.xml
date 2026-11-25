@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/calendar_day_cell"
+    android:layout_width="match_parent"
+    android:layout_height="48dp"
+    android:clickable="true"
+    android:focusable="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_day_number"
+            style="@style/Text.App.Body"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="16" />
+
+        <!-- 최대 6개(2줄 x 3개) 도트 컨테이너 -->
+        <LinearLayout
+            android:id="@+id/event_dots_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <!-- 1행: 점 1, 2, 3 -->
+            <LinearLayout
+                android:id="@+id/event_dots_row1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <View
+                    android:id="@+id/dot_1"
+                    android:layout_width="5dp"
+                    android:layout_height="5dp"
+                    android:layout_margin="1dp"
+                    android:background="@drawable/bg_dot"
+                    android:visibility="gone" />
+
+                <View
+                    android:id="@+id/dot_2"
+                    android:layout_width="5dp"
+                    android:layout_height="5dp"
+                    android:layout_margin="1dp"
+                    android:background="@drawable/bg_dot"
+                    android:visibility="gone" />
+
+                <View
+                    android:id="@+id/dot_3"
+                    android:layout_width="5dp"
+                    android:layout_height="5dp"
+                    android:layout_margin="1dp"
+                    android:background="@drawable/bg_dot"
+                    android:visibility="gone" />
+            </LinearLayout>
+
+            <!-- 2행: 점 4, 5, 6 -->
+            <LinearLayout
+                android:id="@+id/event_dots_row2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <View
+                    android:id="@+id/dot_4"
+                    android:layout_width="5dp"
+                    android:layout_height="5dp"
+                    android:layout_margin="1dp"
+                    android:background="@drawable/bg_dot"
+                    android:visibility="gone" />
+
+                <View
+                    android:id="@+id/dot_5"
+                    android:layout_width="5dp"
+                    android:layout_height="5dp"
+                    android:layout_margin="1dp"
+                    android:background="@drawable/bg_dot"
+                    android:visibility="gone" />
+
+                <View
+                    android:id="@+id/dot_6"
+                    android:layout_width="5dp"
+                    android:layout_height="5dp"
+                    android:layout_margin="1dp"
+                    android:background="@drawable/bg_dot"
+                    android:visibility="gone" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+</FrameLayout>
