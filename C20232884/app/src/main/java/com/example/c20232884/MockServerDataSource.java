@@ -123,7 +123,7 @@ public class MockServerDataSource {
     // 비동기 파이어스토어 호환 콜백 리스너 메서드 (Async Listener APIs)
     // =============================================================================================
 
-    public void fetchServerUnitSchedules(OnScheduleLoadListener listener) {
+    public void fetchServerSchedules(OnScheduleLoadListener listener) {
         mainHandler.post(() -> {
             if (listener != null) {
                 listener.onSuccess(new ArrayList<>(serverUnitSchedules));
@@ -131,8 +131,22 @@ public class MockServerDataSource {
         });
     }
 
-    public void publishUnitSchedule(ScheduleItem schedule, OnCompleteListener listener) {
-        if (schedule != null && "부대".equals(schedule.getType())) {
+    public void fetchServerUnitSchedules(OnScheduleLoadListener listener) {
+        mainHandler.post(() -> {
+            List<ScheduleItem> unitOnly = new ArrayList<>();
+            for (ScheduleItem item : serverUnitSchedules) {
+                if ("부대".equals(item.getType())) {
+                    unitOnly.add(item);
+                }
+            }
+            if (listener != null) {
+                listener.onSuccess(unitOnly);
+            }
+        });
+    }
+
+    public void publishSchedule(ScheduleItem schedule, OnCompleteListener listener) {
+        if (schedule != null) {
             serverUnitSchedules.add(0, schedule);
             saveSchedulesToPrefs();
         }
@@ -141,6 +155,10 @@ public class MockServerDataSource {
                 listener.onSuccess();
             }
         });
+    }
+
+    public void publishUnitSchedule(ScheduleItem schedule, OnCompleteListener listener) {
+        publishSchedule(schedule, listener);
     }
 
     public void fetchServerPosts(OnPostLoadListener listener) {
@@ -305,12 +323,20 @@ public class MockServerDataSource {
     // 동기식 헬퍼 메서드 (Synchronous Helper APIs for Backwards Compatibility)
     // =============================================================================================
 
+    public List<ScheduleItem> fetchServerSchedules() {
+        return new ArrayList<>(serverUnitSchedules);
+    }
+
     public List<ScheduleItem> fetchServerUnitSchedules() {
         return new ArrayList<>(serverUnitSchedules);
     }
 
+    public void publishSchedule(ScheduleItem schedule) {
+        publishSchedule(schedule, null);
+    }
+
     public void publishUnitSchedule(ScheduleItem schedule) {
-        publishUnitSchedule(schedule, null);
+        publishSchedule(schedule, null);
     }
 
     public List<Post> fetchServerPosts() {

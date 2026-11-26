@@ -34,6 +34,7 @@ public class ScheduleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private OnItemClickListener listener;
     private String todayStr = "";
     private String currentYM = "";
+    private String selectedFullDate = "";
 
     public ScheduleAdapter(List<ScheduleItem> scheduleList) {
         this.scheduleList = scheduleList;
@@ -43,9 +44,14 @@ public class ScheduleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         this.listener = listener;
     }
 
-    public void setCalendarContext(String todayStr, String currentYM) {
+    public void setCalendarContext(String todayStr, String currentYM, String selectedFullDate) {
         this.todayStr = (todayStr != null) ? todayStr : "";
         this.currentYM = (currentYM != null) ? currentYM : "";
+        this.selectedFullDate = (selectedFullDate != null) ? selectedFullDate : "";
+    }
+
+    public void setCalendarContext(String todayStr, String currentYM) {
+        setCalendarContext(todayStr, currentYM, "");
     }
 
     @Override
@@ -82,46 +88,41 @@ public class ScheduleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         if (position > 0) {
             ScheduleItem previousItem = scheduleList.get(position - 1);
             isSectionChanged = !getSection(item).equals(getSection(previousItem));
+        } else {
+            isSectionChanged = true;
         }
 
         boolean isPast = "PAST".equals(getSection(item));
         holder.itemView.setAlpha(isPast ? 0.55f : 1.0f);
 
-        // 카드 터치 시 날짜 및 월 선택 동기화 리스너
-        View.OnClickListener selectDateListener = v -> {
+        // 카드 터치 시 상세정보 및 수정 다이얼로그 즉시 팝업 리스너
+        View.OnClickListener itemDetailListener = v -> {
             if (listener != null) {
-                listener.onItemSelectDate(item);
+                listener.onItemDetailClick(item);
             }
         };
 
-        holder.itemView.setOnClickListener(selectDateListener);
+        holder.itemView.setOnClickListener(itemDetailListener);
 
-        // [수정] 내부 카드 레이아웃(scheduleItem/vacationItem)에도 날짜 선택 터치 이벤트 이중 바인딩
         if (holder instanceof ScheduleViewHolder) {
             ScheduleViewHolder scheduleHolder = (ScheduleViewHolder) holder;
             bindScheduleItem(scheduleHolder, item, isSectionChanged);
-
-            scheduleHolder.binding.scheduleItem.setOnClickListener(selectDateListener); // 카드 본체 터치 ➔ 날짜 선택
-            scheduleHolder.binding.btnItemMore.setOnClickListener(v -> {                // 3선 버튼 터치 ➔ 팝업
-                if (listener != null) {
-                    listener.onItemDetailClick(item);
-                }
-            });
+            scheduleHolder.binding.scheduleItem.setOnClickListener(itemDetailListener);
         } else if (holder instanceof VacationViewHolder) {
             VacationViewHolder vacationHolder = (VacationViewHolder) holder;
             bindVacationItem(vacationHolder, item, isSectionChanged);
-
-            vacationHolder.binding.vacationItem.setOnClickListener(selectDateListener); // 카드 본체 터치 ➔ 날짜 선택
-            vacationHolder.binding.btnItemMore.setOnClickListener(v -> {                // 3선 버튼 터치 ➔ 팝업
-                if (listener != null) {
-                    listener.onItemDetailClick(item);
-                }
-            });
+            vacationHolder.binding.vacationItem.setOnClickListener(itemDetailListener);
         }
     }
 
     private void bindScheduleItem(ScheduleViewHolder holder, ScheduleItem item, boolean isSectionChanged) {
-        holder.binding.dividerLine.setVisibility(isSectionChanged ? View.VISIBLE : View.GONE);
+        if (isSectionChanged) {
+            holder.binding.layoutSectionHeader.setVisibility(View.VISIBLE);
+            holder.binding.tvSectionTitle.setText(getSectionTitle(getSection(item)));
+        } else {
+            holder.binding.layoutSectionHeader.setVisibility(View.GONE);
+        }
+
         holder.binding.tvScheduleTitle.setText(item.getTitle());
 
         if (item.getLocation() != null && !item.getLocation().isEmpty()) {
@@ -144,8 +145,6 @@ public class ScheduleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         holder.binding.tvWeekdayTime.setTextColor(textColor);
         holder.binding.tvLocation.setTextColor(textColor);
 
-
-
         if (item.getDate() != null && item.getDate().contains("-")) {
             try {
                 SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.KOREA);
@@ -166,7 +165,13 @@ public class ScheduleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     private void bindVacationItem(VacationViewHolder holder, ScheduleItem item, boolean isSectionChanged) {
-        holder.binding.dividerLine.setVisibility(isSectionChanged ? View.VISIBLE : View.GONE);
+        if (isSectionChanged) {
+            holder.binding.layoutSectionHeader.setVisibility(View.VISIBLE);
+            holder.binding.tvSectionTitle.setText(getSectionTitle(getSection(item)));
+        } else {
+            holder.binding.layoutSectionHeader.setVisibility(View.GONE);
+        }
+
         holder.binding.tvVacationTitle.setText(item.getTitle());
         holder.binding.tvVacationDurationBadge.setText("4일"); // 기간 뱃지
 
@@ -196,14 +201,31 @@ public class ScheduleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         String date = item.getDate();
 
-        if (todayStr != null && !todayStr.isEmpty() && date.equals(todayStr)) {
-            return "TODAY";
+        if (selectedFullDate != null && !selectedFullDate.isEmpty() && date.equals(selectedFullDate)) {
+            return "SELECTED_DATE";
+        } else if (todayStr != null && !todayStr.isEmpty() && date.equals(todayStr)) {
+            return "THIS_MONTH";
         } else if (todayStr != null && !todayStr.isEmpty() && date.compareTo(todayStr) < 0) {
-            return "PAST"; // 오늘 이전 모든 일정은 PAST(지난 일정, 회색 처리)로 분류
+            return "PAST";
         } else if (currentYM != null && !currentYM.isEmpty() && date.startsWith(currentYM)) {
             return "THIS_MONTH";
         } else {
             return "FUTURE";
+        }
+    }
+
+    private String getSectionTitle(String sectionKey) {
+        switch (sectionKey) {
+            case "SELECTED_DATE":
+                return "선택 날짜";
+            case "THIS_MONTH":
+                return "이번 달";
+            case "FUTURE":
+                return "앞으로의 일정";
+            case "PAST":
+                return "지난 일정";
+            default:
+                return "일정";
         }
     }
 

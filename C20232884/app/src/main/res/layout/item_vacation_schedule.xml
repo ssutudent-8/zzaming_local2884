@@ -5,16 +5,33 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <View
-        android:id="@+id/divider_line"
+    <LinearLayout
+        android:id="@+id/layout_section_header"
         android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="24dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        android:background="@color/divider"
-        android:visibility="gone" />
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="4dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="4dp"
+        android:paddingEnd="4dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/tv_section_title"
+            style="@style/Text.App.CaptionBold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/vacation_text"
+            android:textSize="12sp"
+            tools:text="선택한 날짜" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginStart="8dp"
+            android:background="@color/divider" />
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/vacation_item"
@@ -104,18 +121,14 @@
                 tools:text="06.15(월) 출발 · 06.18(목) 복귀" />
         </LinearLayout>
 
-        <!-- [추가] 우측 끝: 휴가 일정 상세 정보 3점 버튼 (⋮) -->
+        <!-- 우측 끝: 이동 화살표 인디케이터 (›) -->
         <TextView
-            android:id="@+id/btn_item_more"
-            android:layout_width="36dp"
+            android:id="@+id/tv_arrow_more"
+            android:layout_width="24dp"
             android:layout_height="match_parent"
-            android:clickable="true"
-            android:contentDescription="상세 정보"
-            android:focusable="true"
             android:gravity="center"
-            android:text="≡"
+            android:text="›"
             android:textColor="@color/vacation_text"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+            android:textSize="20sp" />
     </LinearLayout>
 </LinearLayout>

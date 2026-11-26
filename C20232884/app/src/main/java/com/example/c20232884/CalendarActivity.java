@@ -200,6 +200,33 @@ public class CalendarActivity extends AppCompatActivity {
             }
         });
 
+        // 5. 오늘이 포함된 월 및 오늘 날짜 자동 이동 및 선택
+        moveToToday();
+
+        // 6. 외부(메인 위젯 +n개 버튼)에서 특정 날짜 및 부대 탭 선택 요청 수신 처리
+        if (getIntent() != null && getIntent().hasExtra("targetDate")) {
+            String targetDate = getIntent().getStringExtra("targetDate");
+            String targetFilter = getIntent().getStringExtra("targetFilter");
+
+            if (targetDate != null && targetDate.contains("-")) {
+                selectedFullDate = targetDate;
+                String[] parts = targetDate.split("-");
+                if (parts.length == 3) {
+                    String itemYM = parts[0] + "-" + parts[1];
+                    int targetMonthIndex = serviceMonthList.indexOf(itemYM);
+                    if (targetMonthIndex != -1) {
+                        currentMonthIndex = targetMonthIndex;
+                    }
+                }
+            }
+
+            if ("UNIT".equals(targetFilter)) {
+                currentFilter = "UNIT";
+                updateTabStyles();
+            }
+            updateCalendarView();
+        }
+
         registerDateChangeReceiver();
     }
 
@@ -459,9 +486,9 @@ public class CalendarActivity extends AppCompatActivity {
         binding.rvCalendarDays.setLayoutManager(new androidx.recyclerview.widget.GridLayoutManager(this, 7));
         binding.rvCalendarDays.setAdapter(dayAdapter);
 
-        // 4. 오늘 기준 일정 4구역 고정 타임라인 세팅
+        // 4. 오늘 및 선택 날짜 기준 소제목 타임라인 세팅
         if (scheduleAdapter != null) {
-            scheduleAdapter.setCalendarContext(todayFullDateStr, currentYM);
+            scheduleAdapter.setCalendarContext(todayFullDateStr, currentYM, selectedFullDate);
         }
 
         List<ScheduleItem> monthSchedules = filterSchedules(year, month);
@@ -552,13 +579,14 @@ public class CalendarActivity extends AppCompatActivity {
     // =============================================================================================
 
     /**
-     * 마스터 데이터(allScheduleList) 중 선택 날짜/오늘 일정을 최상단(1구역)에 두고 타임라인 4구역 순으로 재배열하는 메서드
+     * 마스터 데이터(allScheduleList) 중 선택 날짜 일정을 최상단(1구역)에 두고 타임라인 순으로 재배열하는 메서드
      */
     private List<ScheduleItem> filterSchedules(int year, int month) {
-        List<ScheduleItem> todaySchedules = new ArrayList<>();   // 1구역: 오늘 일정
-        List<ScheduleItem> monthSchedules = new ArrayList<>();   // 2구역: 이번 달 남은 일정
-        List<ScheduleItem> futureSchedules = new ArrayList<>();  // 3구역: 미래 일정
-        List<ScheduleItem> pastSchedules = new ArrayList<>();    // 4구역: 지난 일정
+        List<ScheduleItem> selectedDateSchedules = new ArrayList<>(); // 1구역: 선택한 날짜 일정 (최상단)
+        List<ScheduleItem> todaySchedules = new ArrayList<>();        // 2구역: 오늘 일정
+        List<ScheduleItem> monthSchedules = new ArrayList<>();        // 3구역: 이번 달 남은 일정
+        List<ScheduleItem> futureSchedules = new ArrayList<>();       // 4구역: 미래 일정
+        List<ScheduleItem> pastSchedules = new ArrayList<>();         // 5구역: 지난 일정
 
         Calendar today = Calendar.getInstance();
         String todayStr = String.format(Locale.KOREA, "%04d-%02d-%02d",
@@ -576,19 +604,21 @@ public class CalendarActivity extends AppCompatActivity {
 
             if (!matchesType) continue;
 
-            // 항상 오늘 날짜(todayStr)를 기준으로 고정 분류
-            if (item.getDate().equals(todayStr)) {
-                todaySchedules.add(item);        // 1구역: 오늘 일정
+            if (selectedFullDate != null && !selectedFullDate.isEmpty() && item.getDate().equals(selectedFullDate)) {
+                selectedDateSchedules.add(item);
+            } else if (item.getDate().equals(todayStr)) {
+                todaySchedules.add(item);
             } else if (item.getDate().compareTo(todayStr) < 0) {
-                pastSchedules.add(item);         // 4구역: 오늘 이전 지난 일정 (회색 처리)
+                pastSchedules.add(item);
             } else if (item.getDate().startsWith(currentYM)) {
-                monthSchedules.add(item);        // 2구역: 이번 달 남은 일정
+                monthSchedules.add(item);
             } else {
-                futureSchedules.add(item);       // 3구역: 미래 일정
+                futureSchedules.add(item);
             }
         }
 
         List<ScheduleItem> result = new ArrayList<>();
+        result.addAll(selectedDateSchedules);
         result.addAll(todaySchedules);
         result.addAll(monthSchedules);
         result.addAll(futureSchedules);
@@ -605,7 +635,7 @@ public class CalendarActivity extends AppCompatActivity {
      */
     private void initDummySchedules() {
         allScheduleList.clear();
-        MockServerDataSource.getInstance(this).fetchServerUnitSchedules(new MockServerDataSource.OnScheduleLoadListener() {
+        MockServerDataSource.getInstance(this).fetchServerSchedules(new MockServerDataSource.OnScheduleLoadListener() {
             @Override
             public void onSuccess(List<ScheduleItem> scheduleList) {
                 if (scheduleList != null) {
@@ -617,10 +647,6 @@ public class CalendarActivity extends AppCompatActivity {
             @Override
             public void onFailure(Exception e) {}
         });
-
-        // 2. 로컬 개인/휴가 일정 추가
-        allScheduleList.add(new ScheduleItem("2026-10-09", "한글날 위로휴가", "00:00", "23:59", "자택", "휴가", "휴가증 지참"));
-        allScheduleList.add(new ScheduleItem("2026-12-25", "크리스마스 특별점호", "20:00", "21:00", "생활관", "개인", "특식 지급"));
     }
 
     // =============================================================================================
@@ -697,9 +723,33 @@ public class CalendarActivity extends AppCompatActivity {
      * 일정 추가 다이얼로그의 권한별 유형 스피너 및 휴가 선택 시 동적 폼 변환 세팅
      */
     private void setupScheduleAddForm(DialogScheduleAddBinding dialogBinding, String targetDate, AlertDialog dialog) {
-        dialogBinding.tvAddScheduleDate.setText(targetDate);
+        dialogBinding.inputStartDate.setText(targetDate);
+        dialogBinding.inputEndDate.setText(targetDate);
 
-        // 권한별 일정 유형 스피너 항목 세팅 (간부: 부대/개인/휴가, 병사: 개인/휴가)
+        dialogBinding.inputStartDate.setOnClickListener(v -> {
+            String[] parts = dialogBinding.inputStartDate.getText().toString().split("-");
+            int y = (parts.length == 3) ? Integer.parseInt(parts[0]) : 2026;
+            int m = (parts.length == 3) ? Integer.parseInt(parts[1]) - 1 : 9;
+            int d = (parts.length == 3) ? Integer.parseInt(parts[2]) : 16;
+
+            new DatePickerDialog(this, (view, year, month, dayOfMonth) -> {
+                String pickedDate = String.format(Locale.KOREA, "%04d-%02d-%02d", year, month + 1, dayOfMonth);
+                dialogBinding.inputStartDate.setText(pickedDate);
+            }, y, m, d).show();
+        });
+
+        dialogBinding.inputEndDate.setOnClickListener(v -> {
+            String[] parts = dialogBinding.inputEndDate.getText().toString().split("-");
+            int y = (parts.length == 3) ? Integer.parseInt(parts[0]) : 2026;
+            int m = (parts.length == 3) ? Integer.parseInt(parts[1]) - 1 : 9;
+            int d = (parts.length == 3) ? Integer.parseInt(parts[2]) : 16;
+
+            new DatePickerDialog(this, (view, year, month, dayOfMonth) -> {
+                String pickedDate = String.format(Locale.KOREA, "%04d-%02d-%02d", year, month + 1, dayOfMonth);
+                dialogBinding.inputEndDate.setText(pickedDate);
+            }, y, m, d).show();
+        });
+
         List<String> types = new ArrayList<>();
         if ("간부".equals(memberType)) {
             types.add("부대");
@@ -712,7 +762,6 @@ public class CalendarActivity extends AppCompatActivity {
         );
         dialogBinding.spinnerAddType.setAdapter(spinnerAdapter);
 
-        // 스피너 이벤트: '휴가' 선택 시 시간/장소 숨김 및 휴가 전용 폼 활성화
         dialogBinding.spinnerAddType.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(android.widget.AdapterView<?> parent, View view, int position, long id) {
@@ -720,13 +769,9 @@ public class CalendarActivity extends AppCompatActivity {
                 if ("휴가".equals(selectedType)) {
                     dialogBinding.layoutTimeContainer.setVisibility(View.GONE);
                     dialogBinding.inputLocation.setVisibility(View.GONE);
-                    dialogBinding.layoutVacationContainer.setVisibility(View.VISIBLE);
-                    dialogBinding.inputVacationEnd.setText(targetDate);
-                    dialogBinding.tvVacationDaysCalc.setText("휴가 기간: 1일");
                 } else {
                     dialogBinding.layoutTimeContainer.setVisibility(View.VISIBLE);
                     dialogBinding.inputLocation.setVisibility(View.VISIBLE);
-                    dialogBinding.layoutVacationContainer.setVisibility(View.GONE);
                 }
             }
 
@@ -734,42 +779,63 @@ public class CalendarActivity extends AppCompatActivity {
             public void onNothingSelected(android.widget.AdapterView<?> parent) {}
         });
 
-        // 저장 버튼 이벤트
         dialogBinding.btnSaveSchedule.setOnClickListener(v -> {
             String title = dialogBinding.inputScheduleTitle.getText().toString().trim();
             String selectedType = (String) dialogBinding.spinnerAddType.getSelectedItem();
             String memo = dialogBinding.inputScheduleMemo.getText().toString().trim();
+            String startDate = dialogBinding.inputStartDate.getText().toString().trim();
 
             if (title.isEmpty()) {
                 dialogBinding.inputScheduleTitle.setError("일정 제목을 입력해 주세요.");
                 return;
             }
+            if (startDate.isEmpty()) startDate = targetDate;
 
             ScheduleItem newItem;
             if ("휴가".equals(selectedType)) {
-                String endDate = dialogBinding.inputVacationEnd.getText().toString().trim();
-                if (endDate.isEmpty()) endDate = targetDate;
-                newItem = new ScheduleItem(targetDate, title, "00:00", "23:59", "자택", "휴가", memo);
+                newItem = new ScheduleItem(startDate, title, "00:00", "23:59", "자택", "휴가", memo);
             } else {
                 String startTime = dialogBinding.inputStartTime.getText().toString().trim();
                 String endTime = dialogBinding.inputEndTime.getText().toString().trim();
                 String location = dialogBinding.inputLocation.getText().toString().trim();
-                newItem = new ScheduleItem(targetDate, title, startTime, endTime, location, selectedType, memo);
+                newItem = new ScheduleItem(startDate, title, startTime, endTime, location, selectedType, memo);
             }
 
-            // 간부 유저가 '부대' 일정을 등록할 경우 더미 서버(MockServerDataSource)에도 게시/저장
-            if ("간부".equals(memberType) && "부대".equals(selectedType)) {
-                MockServerDataSource.getInstance().publishUnitSchedule(newItem);
+            if ("부대".equals(selectedType)) {
+                new AlertDialog.Builder(this)
+                        .setTitle("부대 공유 일정 등록")
+                        .setMessage("등록한 일정은 부대의 모든 대원에게 공유됩니다.\n등록하시겠습니까?")
+                        .setPositiveButton("등록", (confirmDialog, which) -> {
+                            saveScheduleItemAndRefresh(newItem, dialog);
+                        })
+                        .setNegativeButton("취소", null)
+                        .show();
+            } else {
+                saveScheduleItemAndRefresh(newItem, dialog);
+            }
+        });
+    }
+
+    private void saveScheduleItemAndRefresh(ScheduleItem newItem, AlertDialog dialog) {
+        MockServerDataSource.getInstance(this).publishSchedule(newItem, new MockServerDataSource.OnCompleteListener() {
+            @Override
+            public void onSuccess() {
+                allScheduleList.add(0, newItem);
+                updateCalendarView();
+                if (dialog != null && dialog.isShowing()) dialog.dismiss();
             }
 
-            allScheduleList.add(0, newItem);
-            updateCalendarView();
-            dialog.dismiss();
+            @Override
+            public void onFailure(Exception e) {
+                allScheduleList.add(0, newItem);
+                updateCalendarView();
+                if (dialog != null && dialog.isShowing()) dialog.dismiss();
+            }
         });
     }
 
     /**
-     * 일정 상세정보 조회, 권한별 날짜/제목 수정, 메모 수정 및 삭제 2차 확인 다이얼로그
+     * 일정 상세정보 조회(깔끔한 독서 모드) 및 수정 모드 전환 다이얼로그
      */
     private void showScheduleDetailDialog(ScheduleItem item) {
         if (item == null) return;
@@ -784,156 +850,103 @@ public class CalendarActivity extends AppCompatActivity {
             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         }
 
-        // 카테고리 텍스트 및 유형별 상징 색상 바인딩
+        boolean isOfficer = "간부".equals(memberType);
+        boolean canEdit = !"부대".equals(item.getType()) || isOfficer;
+
         String typeStr = (item.getType() != null) ? item.getType() : "";
-        String categoryText = typeStr + " 일정";
-        dialogBinding.tvDetailCategory.setText(categoryText);
+        dialogBinding.tvDetailCategory.setText(typeStr + " 일정 상세");
 
         int catColorRes = "부대".equals(typeStr) ? R.color.forest_700 :
                 ("휴가".equals(typeStr) ? R.color.vacation_text : R.color.personal);
         dialogBinding.tvDetailCategory.setTextColor(ContextCompat.getColor(this, catColorRes));
 
-        dialogBinding.tvDetailTitle.setText(item.getTitle());
+        // 1. 조회 모드 데이터 바인딩 (상자 없는 깔끔한 보기)
+        dialogBinding.tvReadTitle.setText(item.getTitle() != null ? item.getTitle() : "");
+        dialogBinding.tvReadTime.setText("일시: " + (item.getDate() != null ? item.getDate() : "") + " (" + item.getTimeRange() + ")");
+        dialogBinding.tvReadLocation.setText("장소: " + (item.getLocation() != null && !item.getLocation().isEmpty() ? item.getLocation() : "-"));
+        dialogBinding.tvReadMemo.setText("메모: " + (item.getMemo() != null && !item.getMemo().isEmpty() ? item.getMemo() : "-"));
 
-        String startTimeStr = (item.getStartTime() != null && !item.getStartTime().isEmpty()) ? item.getStartTime() : "-";
-        String endTimeStr = (item.getEndTime() != null && !item.getEndTime().isEmpty()) ? item.getEndTime() : "-";
-        String locationStr = (item.getLocation() != null && !item.getLocation().isEmpty()) ? item.getLocation() : "-";
+        dialogBinding.layoutReadView.setVisibility(View.VISIBLE);
+        dialogBinding.layoutEditForm.setVisibility(View.GONE);
 
-        dialogBinding.tvDetailStart.setText("시작 시간\n" + startTimeStr);
-        dialogBinding.tvDetailEnd.setText("종료 시간\n" + endTimeStr);
-        dialogBinding.tvDetailLocation.setText("장소\n" + locationStr);
+        if (canEdit) {
+            dialogBinding.btnEditMode.setVisibility(View.VISIBLE);
+            dialogBinding.btnEditMode.setOnClickListener(v -> {
+                dialogBinding.layoutReadView.setVisibility(View.GONE);
+                dialogBinding.layoutEditForm.setVisibility(View.VISIBLE);
+                dialogBinding.btnEditMode.setVisibility(View.GONE);
 
-        final String originalTitle = (item.getTitle() != null) ? item.getTitle() : "";
-        final String originalDate = (item.getDate() != null) ? item.getDate() : "";
-        final String originalMemo = item.getMemo();
-
-        final String[] currentTitleHolder = {originalTitle};
-        final String[] currentDateHolder = {originalDate};
-
-        // 개인 일정(또는 간부)인 경우 제목 터치 시 제목 수정 다이얼로그 연동
-        boolean canEditTitle = "개인".equals(item.getType()) || ("간부".equals(memberType) && "부대".equals(item.getType()));
-        if (canEditTitle) {
-            dialogBinding.tvDetailTitle.setOnClickListener(v -> {
-                android.widget.EditText inputTitle = new android.widget.EditText(this);
-                inputTitle.setText(currentTitleHolder[0]);
-                inputTitle.setPadding(32, 24, 32, 24);
-
-                new AlertDialog.Builder(this)
-                        .setTitle("일정 제목 수정")
-                        .setView(inputTitle)
-                        .setPositiveButton("확인", (d, which) -> {
-                            String newTitle = inputTitle.getText().toString().trim();
-                            if (!newTitle.isEmpty()) {
-                                currentTitleHolder[0] = newTitle;
-                                dialogBinding.tvDetailTitle.setText(newTitle);
-                                checkScheduleModified(dialogBinding, currentTitleHolder[0], originalTitle, currentDateHolder[0], originalDate, originalMemo);
-                            }
-                        })
-                        .setNegativeButton("취소", null)
-                        .show();
+                // 수정 폼 데이터 세팅
+                dialogBinding.inputDetailTitle.setText(item.getTitle() != null ? item.getTitle() : "");
+                dialogBinding.inputDetailStartTime.setText(item.getStartTime() != null ? item.getStartTime() : "");
+                dialogBinding.inputDetailEndTime.setText(item.getEndTime() != null ? item.getEndTime() : "");
+                dialogBinding.inputDetailLocation.setText(item.getLocation() != null ? item.getLocation() : "");
+                dialogBinding.inputDetailMemo.setText(item.getMemo() != null ? item.getMemo() : "");
             });
-        }
-
-        // 날짜 수정 권한 판별
-        boolean canEditDate = "개인".equals(item.getType()) || ("간부".equals(memberType) && "부대".equals(item.getType()));
-
-        if (!originalDate.isEmpty()) {
-            dialogBinding.tvFixedMessage.setVisibility(View.VISIBLE);
-            dialogBinding.tvFixedMessage.setText("일정 일자: " + currentDateHolder[0]);
-
-            if (canEditDate) {
-                dialogBinding.tvFixedMessage.setBackgroundResource(R.drawable.bg_input);
-                dialogBinding.tvFixedMessage.setPadding(32, 24, 32, 24);
-                dialogBinding.tvFixedMessage.setOnClickListener(v -> {
-                    String[] parts = currentDateHolder[0].split("-");
-                    int y = Integer.parseInt(parts[0]);
-                    int m = Integer.parseInt(parts[1]) - 1;
-                    int d = Integer.parseInt(parts[2]);
-
-                    DatePickerDialog picker = new DatePickerDialog(this, (view, year, month, dayOfMonth) -> {
-                        currentDateHolder[0] = String.format(Locale.KOREA, "%04d-%02d-%02d", year, month + 1, dayOfMonth);
-                        dialogBinding.tvFixedMessage.setText("일정 일자: " + currentDateHolder[0]);
-                        checkScheduleModified(dialogBinding, currentTitleHolder[0], originalTitle, currentDateHolder[0], originalDate, originalMemo);
-                    }, y, m, d);
-
-                    if (enlistmentMillis > 0) picker.getDatePicker().setMinDate(enlistmentMillis);
-                    if (dischargeMillis > 0) picker.getDatePicker().setMaxDate(dischargeMillis);
-
-                    picker.show();
-                });
-            } else {
-                // 수정 불가 항목: 상자 배경 및 클릭 제거
-                dialogBinding.tvFixedMessage.setBackground(null);
-                dialogBinding.tvFixedMessage.setPadding(0, 12, 0, 12);
-                dialogBinding.tvFixedMessage.setOnClickListener(null);
-            }
         } else {
-            dialogBinding.tvFixedMessage.setVisibility(View.GONE);
+            dialogBinding.btnEditMode.setVisibility(View.GONE);
         }
 
-        // 메모 세팅
-        dialogBinding.inputDetailMemo.setText(originalMemo);
-
-        // [버튼 초기화] "수정사항 저장" 버튼 초기 비활성화
-        dialogBinding.btnSaveMemo.setText("수정사항 저장");
-        dialogBinding.btnSaveMemo.setEnabled(false);
-        dialogBinding.btnSaveMemo.setAlpha(0.4f);
-
-        // 메모 텍스트 변경 감지하여 저장 버튼 활성화
-        dialogBinding.inputDetailMemo.addTextChangedListener(new android.text.TextWatcher() {
-            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
-                checkScheduleModified(dialogBinding, currentTitleHolder[0], originalTitle, currentDateHolder[0], originalDate, originalMemo);
+        // 수정 취소 버튼
+        dialogBinding.btnCancelEdit.setOnClickListener(v -> {
+            dialogBinding.layoutReadView.setVisibility(View.VISIBLE);
+            dialogBinding.layoutEditForm.setVisibility(View.GONE);
+            if (canEdit) {
+                dialogBinding.btnEditMode.setVisibility(View.VISIBLE);
             }
-            @Override public void afterTextChanged(android.text.Editable s) {}
         });
 
-        // 닫기 버튼
         dialogBinding.btnCloseDetail.setOnClickListener(v -> dialog.dismiss());
 
-        // 수정사항 저장 버튼 클릭 이벤트
-        dialogBinding.btnSaveMemo.setOnClickListener(v -> {
+        // 수정사항 저장
+        dialogBinding.btnSaveSchedule.setOnClickListener(v -> {
+            String newTitle = dialogBinding.inputDetailTitle.getText().toString().trim();
+            String newStart = dialogBinding.inputDetailStartTime.getText().toString().trim();
+            String newEnd = dialogBinding.inputDetailEndTime.getText().toString().trim();
+            String newLocation = dialogBinding.inputDetailLocation.getText().toString().trim();
             String newMemo = dialogBinding.inputDetailMemo.getText().toString().trim();
-            item.setTitle(currentTitleHolder[0]);
-            item.setDate(currentDateHolder[0]);
+
+            if (newTitle.isEmpty()) {
+                dialogBinding.inputDetailTitle.setError("일정 제목을 입력해 주세요.");
+                return;
+            }
+
+            item.setTitle(newTitle);
+            item.setStartTime(newStart);
+            item.setEndTime(newEnd);
+            item.setLocation(newLocation);
             item.setMemo(newMemo);
-            Toast.makeText(this, "수정사항이 저장되었습니다.", Toast.LENGTH_SHORT).show();
-            updateCalendarView();
-            dialog.dismiss();
+
+            MockServerDataSource.getInstance(this).publishSchedule(item, new MockServerDataSource.OnCompleteListener() {
+                @Override
+                public void onSuccess() {
+                    Toast.makeText(CalendarActivity.this, "일정 수정 사항이 저장되었습니다.", Toast.LENGTH_SHORT).show();
+                    updateCalendarView();
+                    dialog.dismiss();
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                    Toast.makeText(CalendarActivity.this, "일정 수정 실패", Toast.LENGTH_SHORT).show();
+                }
+            });
         });
 
-        // 삭제 권한 판별 (개인 일정 OR 간부 권한의 부대 일정)
-        boolean canDelete = "개인".equals(item.getType()) || ("간부".equals(memberType) && "부대".equals(item.getType()));
-        if (canDelete) {
-            dialogBinding.btnDeleteSchedule.setVisibility(View.VISIBLE);
-            dialogBinding.btnDeleteSchedule.setOnClickListener(v -> {
-                // 삭제 2차 확인 다이얼로그
-                new AlertDialog.Builder(this)
-                        .setTitle("일정 삭제")
-                        .setMessage("정말로 이 일정을 삭제하시겠습니까?")
-                        .setPositiveButton("삭제", (confirmDialog, which) -> {
-                            allScheduleList.remove(item);
-                            Toast.makeText(this, "일정이 삭제되었습니다.", Toast.LENGTH_SHORT).show();
-                            updateCalendarView();
-                            dialog.dismiss();
-                        })
-                        .setNegativeButton("취소", null)
-                        .show();
-            });
-        } else {
-            dialogBinding.btnDeleteSchedule.setVisibility(View.GONE);
-        }
+        // 일정 삭제 (수정 모드 안에서만 노출)
+        dialogBinding.btnDeleteSchedule.setOnClickListener(v -> {
+            new AlertDialog.Builder(this)
+                    .setTitle("일정 삭제")
+                    .setMessage("정말로 이 일정을 삭제하시겠습니까?")
+                    .setPositiveButton("삭제", (confirmDialog, which) -> {
+                        allScheduleList.remove(item);
+                        Toast.makeText(this, "일정이 삭제되었습니다.", Toast.LENGTH_SHORT).show();
+                        updateCalendarView();
+                        dialog.dismiss();
+                    })
+                    .setNegativeButton("취소", null)
+                    .show();
+        });
 
         dialog.show();
-    }
-
-    /**
-     * 제목, 날짜, 메모 변경 여부 체크 후 "수정사항 저장" 버튼 활성화 제어 헬퍼 메서드
-     */
-    private void checkScheduleModified(DialogScheduleDetailBinding binding, String currentTitle, String originalTitle, String currentDate, String originalDate, String originalMemo) {
-        String currentMemo = binding.inputDetailMemo.getText().toString().trim();
-        boolean isModified = !currentTitle.equals(originalTitle) || !currentDate.equals(originalDate) || !currentMemo.equals(originalMemo);
-        binding.btnSaveMemo.setEnabled(isModified);
-        binding.btnSaveMemo.setAlpha(isModified ? 1.0f : 0.4f);
     }
 }

@@ -62,7 +62,9 @@
                 android:id="@+id/rv_schedules"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:overScrollMode="ifContentScrolls" />
+                android:clipToPadding="false"
+                android:overScrollMode="ifContentScrolls"
+                android:paddingBottom="120dp" />
 
             <TextView
                 android:id="@+id/btn_add_schedule"

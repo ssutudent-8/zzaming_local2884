@@ -101,35 +101,37 @@ public class CalendarDayAdapter extends RecyclerView.Adapter<CalendarDayAdapter.
                 }
             }
 
-            // 1) 배경 설정: 휴가 배경을 숫자와 도트 '뒤' 셀 배경(itemView)으로 배치
+            // 1) 배경 및 텍스트 색상 설정
+            holder.binding.tvDayNumber.setBackground(null);
+
             if (hasVacation) {
-                if (isToday) {
-                    holder.binding.tvDayNumber.setBackgroundResource(R.drawable.bg_day_today_vacation);
-                    holder.binding.tvDayNumber.setTextColor(Color.WHITE);
-                    holder.itemView.setBackgroundResource(R.drawable.bg_day_vacation);
+                if (isToday && isSelected) {
+                    holder.binding.tvDayNumber.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.forest_900));
+                    holder.itemView.setBackgroundResource(R.drawable.bg_day_today_selected);
+                } else if (isToday) {
+                    holder.binding.tvDayNumber.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.forest_700));
+                    holder.itemView.setBackgroundResource(R.drawable.bg_day_today);
                 } else if (isSelected) {
-                    holder.binding.tvDayNumber.setBackground(null);
-                    holder.binding.tvDayNumber.setTextColor(holder.itemView.getContext().getColor(R.color.text_primary));
+                    holder.binding.tvDayNumber.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.text_primary));
                     holder.itemView.setBackgroundResource(R.drawable.bg_day_today_vacation);
                 } else {
-                    holder.binding.tvDayNumber.setBackground(null);
-                    holder.binding.tvDayNumber.setTextColor(holder.itemView.getContext().getColor(R.color.text_primary));
+                    holder.binding.tvDayNumber.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.text_primary));
                     holder.itemView.setBackgroundResource(R.drawable.bg_day_vacation);
                 }
             } else {
-                // 일반 날짜 배경 설정
-                if (isSelected) {
+                // 일반 날짜 배경 및 테두리 설정 (전체 칸 감싸기)
+                if (isToday && isSelected) {
+                    holder.binding.tvDayNumber.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.forest_900));
+                    holder.itemView.setBackgroundResource(R.drawable.bg_day_today_selected);
+                } else if (isToday) {
+                    holder.binding.tvDayNumber.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.forest_700));
+                    holder.itemView.setBackgroundResource(R.drawable.bg_day_today);
+                } else if (isSelected) {
+                    holder.binding.tvDayNumber.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.forest_900));
                     holder.itemView.setBackgroundResource(R.drawable.bg_day_selected);
                 } else {
+                    holder.binding.tvDayNumber.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.text_primary));
                     holder.itemView.setBackground(null);
-                }
-
-                if (isToday) {
-                    holder.binding.tvDayNumber.setBackgroundResource(R.drawable.bg_day_today);
-                    holder.binding.tvDayNumber.setTextColor(Color.WHITE);
-                } else {
-                    holder.binding.tvDayNumber.setBackground(null);
-                    holder.binding.tvDayNumber.setTextColor(holder.itemView.getContext().getColor(R.color.text_primary));
                 }
             }
 

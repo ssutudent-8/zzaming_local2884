@@ -1,32 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
-    android:orientation="vertical"
-    >
+    android:background="@color/calendar_background"
+    android:fillViewport="true">
 
-    <Button
-        android:id="@+id/btn_main_setting"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="12dp"
-        android:backgroundTint="@color/forest_700"
-        android:text="복무 및 권한 설정" />
+        android:orientation="vertical"
+        android:padding="16dp">
 
-    <Button
-        android:id="@+id/btn_main_to_calender"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:backgroundTint="@color/forest_900"
-        android:text="캘린더" />
+        <!-- 복무기간 및 권한 설정 버튼 -->
+        <Button
+            android:id="@+id/btn_main_setting"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:backgroundTint="@color/forest_700"
+            android:text="복무 및 권한 설정"
+            android:textColor="@color/surface"
+            android:textSize="15sp" />
 
-    <Button
-        android:id="@+id/btn_main_to_board"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:backgroundTint="@color/forest_900"
-        android:text="게시판" />
+        <!-- 1. 이번 주 캘린더 위젯 카드 -->
+        <include
+            android:id="@+id/include_card_schedule"
+            layout="@layout/card_schedule"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp" />
 
-</LinearLayout>
+        <!-- 2. 부대 게시판 이동 카드 -->
+        <include
+            android:id="@+id/include_card_board"
+            layout="@layout/card_board"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp" />
+
+        <!-- 3. 마음의 편지 수신함/작성 이동 카드 -->
+        <include
+            android:id="@+id/include_card_letter"
+            layout="@layout/card_letter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp" />
+
+    </LinearLayout>
+</ScrollView>

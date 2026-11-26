@@ -70,6 +70,8 @@ public class PostActivity extends AppCompatActivity {
             memberType = passedMemberType;
         }
 
+        String startCategory = getIntent().getStringExtra("startCategory");
+
         binding.btnBack.setOnClickListener(v -> finish());
 
         if ("간부".equals(memberType)) {
@@ -105,6 +107,16 @@ public class PostActivity extends AppCompatActivity {
                             .show();
                 }
             });
+
+            if ("마음의 편지".equals(startCategory)) {
+                binding.layoutFilterTabs.setVisibility(View.GONE);
+                binding.btnCompose.setVisibility(View.GONE);
+                binding.tvPostHeaderTitle.setText("📬 마음의 편지 수신함");
+                binding.tvPostSubTitle.setText("대원 무기명 건의 및 고충 수신 내역");
+                binding.postEmpty.setText("새로 접수된 마음의 편지가 없습니다.");
+                binding.btnInbox.setText("부대 게시판");
+                currentCategory = "마음의 편지";
+            }
         } else {
             binding.btnInbox.setVisibility(View.GONE);
         }

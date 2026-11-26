@@ -1,0 +1,566 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ───────────── 이번 주 캘린더 카드 위젯 (card_schedule.xml) ───────────── -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/card_schedule"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_card"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/Text.App.Caption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="이번 주" />
+
+            <TextView
+                style="@style/Text.App.CaptionBold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:text="캘린더"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/btn_calendar_all"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="4dp">
+
+            <TextView
+                style="@style/Text.App.Caption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="전체보기" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=" ›"
+                android:textColor="@color/text_secondary"
+                android:textSize="16sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- 요일 7칸 스트립 -->
+    <LinearLayout
+        android:id="@+id/week_row"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="15dp"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:id="@+id/week_mon"
+            android:layout_width="36dp"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:paddingTop="7dp"
+            android:paddingBottom="5dp">
+
+            <TextView
+                android:id="@+id/tv_week_mon_label"
+                style="@style/Text.App.Caption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="월"
+                android:textSize="11sp" />
+
+            <TextView
+                android:id="@+id/tv_week_mon_date"
+                style="@style/Text.App.CaptionBold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="14"
+                android:textSize="14sp" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:orientation="horizontal">
+
+                <View
+                    android:id="@+id/dot_week_mon_1"
+                    android:layout_width="4dp"
+                    android:layout_height="4dp"
+                    android:layout_marginEnd="2dp"
+                    android:background="@drawable/bg_dot"
+                    android:visibility="invisible" />
+
+                <View
+                    android:id="@+id/dot_week_mon_2"
+                    android:layout_width="4dp"
+                    android:layout_height="4dp"
+                    android:layout_marginEnd="2dp"
+                    android:background="@drawable/bg_dot"
+                    android:visibility="invisible" />
+
+                <View
+                    android:id="@+id/dot_week_mon_3"
+                    android:layout_width="4dp"
+                    android:layout_height="4dp"
+                    android:background="@drawable/bg_dot"
+                    android:visibility="invisible" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <LinearLayout
+            android:id="@+id/week_tue"
+            android:layout_width="36dp"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:paddingTop="7dp"
+            android:paddingBottom="5dp">
+
+            <TextView
+                android:id="@+id/tv_week_tue_label"
+                style="@style/Text.App.Caption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="화"
+                android:textSize="11sp" />
+
+            <TextView
+                android:id="@+id/tv_week_tue_date"
+                style="@style/Text.App.CaptionBold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="15"
+                android:textSize="14sp" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:orientation="horizontal">
+
+                <View
+                    android:id="@+id/dot_week_tue_1"
+                    android:layout_width="4dp"
+                    android:layout_height="4dp"
+                    android:layout_marginEnd="2dp"
+                    android:background="@drawable/bg_dot"
+                    android:visibility="invisible" />
+
+                <View
+                    android:id="@+id/dot_week_tue_2"
+                    android:layout_width="4dp"
+                    android:layout_height="4dp"
+                    android:layout_marginEnd="2dp"
+                    android:background="@drawable/bg_dot"
+                    android:visibility="invisible" />
+
+                <View
+                    android:id="@+id/dot_week_tue_3"
+                    android:layout_width="4dp"
+                    android:layout_height="4dp"
+                    android:background="@drawable/bg_dot"
+                    android:visibility="invisible" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <LinearLayout
+            android:id="@+id/week_wed"
+            android:layout_width="36dp"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:paddingTop="7dp"
+            android:paddingBottom="5dp">
+
+            <TextView
+                android:id="@+id/tv_week_wed_label"
+                style="@style/Text.App.Caption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="수"
+                android:textSize="11sp" />
+
+            <TextView
+                android:id="@+id/tv_week_wed_date"
+                style="@style/Text.App.CaptionBold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="16"
+                android:textSize="14sp" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:orientation="horizontal">
+
+                <View
+                    android:id="@+id/dot_week_wed_1"
+                    android:layout_width="4dp"
+                    android:layout_height="4dp"
+                    android:layout_marginEnd="2dp"
+                    android:background="@drawable/bg_dot"
+                    android:visibility="invisible" />
+
+                <View
+                    android:id="@+id/dot_week_wed_2"
+                    android:layout_width="4dp"
+                    android:layout_height="4dp"
+                    android:layout_marginEnd="2dp"
+                    android:background="@drawable/bg_dot"
+                    android:visibility="invisible" />
+
+                <View
+                    android:id="@+id/dot_week_wed_3"
+                    android:layout_width="4dp"
+                    android:layout_height="4dp"
+                    android:background="@drawable/bg_dot"
+                    android:visibility="invisible" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <LinearLayout
+            android:id="@+id/week_thu"
+            android:layout_width="36dp"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:paddingTop="7dp"
+            android:paddingBottom="5dp">
+
+            <TextView
+                android:id="@+id/tv_week_thu_label"
+                style="@style/Text.App.Caption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="목"
+                android:textSize="11sp" />
+
+            <TextView
+                android:id="@+id/tv_week_thu_date"
+                style="@style/Text.App.CaptionBold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="17"
+                android:textSize="14sp" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:orientation="horizontal">
+
+                <View
+                    android:id="@+id/dot_week_thu_1"
+                    android:layout_width="4dp"
+                    android:layout_height="4dp"
+                    android:layout_marginEnd="2dp"
+                    android:background="@drawable/bg_dot"
+                    android:visibility="invisible" />
+
+                <View
+                    android:id="@+id/dot_week_thu_2"
+                    android:layout_width="4dp"
+                    android:layout_height="4dp"
+                    android:layout_marginEnd="2dp"
+                    android:background="@drawable/bg_dot"
+                    android:visibility="invisible" />
+
+                <View
+                    android:id="@+id/dot_week_thu_3"
+                    android:layout_width="4dp"
+                    android:layout_height="4dp"
+                    android:background="@drawable/bg_dot"
+                    android:visibility="invisible" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <LinearLayout
+            android:id="@+id/week_fri"
+            android:layout_width="36dp"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:paddingTop="7dp"
+            android:paddingBottom="5dp">
+
+            <TextView
+                android:id="@+id/tv_week_fri_label"
+                style="@style/Text.App.Caption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="금"
+                android:textSize="11sp" />
+
+            <TextView
+                android:id="@+id/tv_week_fri_date"
+                style="@style/Text.App.CaptionBold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="18"
+                android:textSize="14sp" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:orientation="horizontal">
+
+                <View
+                    android:id="@+id/dot_week_fri_1"
+                    android:layout_width="4dp"
+                    android:layout_height="4dp"
+                    android:layout_marginEnd="2dp"
+                    android:background="@drawable/bg_dot"
+                    android:visibility="invisible" />
+
+                <View
+                    android:id="@+id/dot_week_fri_2"
+                    android:layout_width="4dp"
+                    android:layout_height="4dp"
+                    android:layout_marginEnd="2dp"
+                    android:background="@drawable/bg_dot"
+                    android:visibility="invisible" />
+
+                <View
+                    android:id="@+id/dot_week_fri_3"
+                    android:layout_width="4dp"
+                    android:layout_height="4dp"
+                    android:background="@drawable/bg_dot"
+                    android:visibility="invisible" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <LinearLayout
+            android:id="@+id/week_sat"
+            android:layout_width="36dp"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:paddingTop="7dp"
+            android:paddingBottom="5dp">
+
+            <TextView
+                android:id="@+id/tv_week_sat_label"
+                style="@style/Text.App.Caption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="토"
+                android:textSize="11sp" />
+
+            <TextView
+                android:id="@+id/tv_week_sat_date"
+                style="@style/Text.App.CaptionBold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="19"
+                android:textSize="14sp" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:orientation="horizontal">
+
+                <View
+                    android:id="@+id/dot_week_sat_1"
+                    android:layout_width="4dp"
+                    android:layout_height="4dp"
+                    android:layout_marginEnd="2dp"
+                    android:background="@drawable/bg_dot"
+                    android:visibility="invisible" />
+
+                <View
+                    android:id="@+id/dot_week_sat_2"
+                    android:layout_width="4dp"
+                    android:layout_height="4dp"
+                    android:layout_marginEnd="2dp"
+                    android:background="@drawable/bg_dot"
+                    android:visibility="invisible" />
+
+                <View
+                    android:id="@+id/dot_week_sat_3"
+                    android:layout_width="4dp"
+                    android:layout_height="4dp"
+                    android:background="@drawable/bg_dot"
+                    android:visibility="invisible" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <LinearLayout
+            android:id="@+id/week_sun"
+            android:layout_width="36dp"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:paddingTop="7dp"
+            android:paddingBottom="5dp">
+
+            <TextView
+                android:id="@+id/tv_week_sun_label"
+                style="@style/Text.App.Caption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="일"
+                android:textSize="11sp" />
+
+            <TextView
+                android:id="@+id/tv_week_sun_date"
+                style="@style/Text.App.CaptionBold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="20"
+                android:textSize="14sp" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:orientation="horizontal">
+
+                <View
+                    android:id="@+id/dot_week_sun_1"
+                    android:layout_width="4dp"
+                    android:layout_height="4dp"
+                    android:layout_marginEnd="2dp"
+                    android:background="@drawable/bg_dot"
+                    android:visibility="invisible" />
+
+                <View
+                    android:id="@+id/dot_week_sun_2"
+                    android:layout_width="4dp"
+                    android:layout_height="4dp"
+                    android:layout_marginEnd="2dp"
+                    android:background="@drawable/bg_dot"
+                    android:visibility="invisible" />
+
+                <View
+                    android:id="@+id/dot_week_sun_3"
+                    android:layout_width="4dp"
+                    android:layout_height="4dp"
+                    android:background="@drawable/bg_dot"
+                    android:visibility="invisible" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- 오늘의 대표 일정 요약 박스 -->
+    <LinearLayout
+        android:id="@+id/item_today_schedule"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_input"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="14dp">
+
+        <TextView
+            android:id="@+id/tv_today_schedule_time"
+            style="@style/Text.App.CaptionBold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="09:00"
+            android:textColor="@color/forest_700"
+            android:textSize="13sp" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_today_schedule_title"
+                style="@style/Text.App.CaptionBold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="대대 전투체육"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/tv_today_schedule_desc"
+                style="@style/Text.App.Caption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="연병장 집합 · 전투복"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tv_today_schedule_more"
+            style="@style/Text.App.CaptionBold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/bg_badge_more"
+            android:clickable="true"
+            android:focusable="true"
+            android:paddingStart="10dp"
+            android:paddingTop="5dp"
+            android:paddingEnd="10dp"
+            android:paddingBottom="5dp"
+            android:text="+1개 부대 일정"
+            android:textColor="@color/surface"
+            android:textSize="11sp"
+            android:visibility="gone" />
+    </LinearLayout>
+</LinearLayout>
